@@ -1,0 +1,10 @@
+@use "../../coreStyles/colors.scss" as globalColors;
+.page-section-container {
+  height: 100vh;
+  background-color: globalColors.$black2;
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}

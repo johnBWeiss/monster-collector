@@ -1,0 +1,43 @@
+@use "../../../../coreStyles/colors.scss" as globalColors;
+
+.welcome-section-image-container {
+  background-color: globalColors.$grey1;
+  width: 50%;
+  height: 100%;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcome-section-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+}
+
+.welcome-section-image {
+  width: 200px; /* Adjust as needed */
+  height: 200px; /* Adjust as needed */
+  border-radius: 50%; /* Makes the image circular */
+  overflow: hidden; /* Ensures the image stays within the circle */
+  box-shadow: 0 0 15px 5px rgba(0, 255, 255, 0.7); /* Glowing effect */
+  transition: box-shadow 0.3s ease; /* Smooth transition on hover */
+}
+
+.welcome-section-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image fits the container */
+}
+
+.welcome-section-image:hover {
+  box-shadow: 0 0 25px 10px rgba(0, 255, 255, 1); /* Brighter glow on hover */
+}
+
+.welcome-section-content {
+  padding-left: 20px; /* Adjust as necessary */
+}

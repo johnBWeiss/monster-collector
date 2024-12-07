@@ -1,0 +1,235 @@
+.flex {
+  display: flex;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.space-around {
+  justify-content: space-around;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.flex-end {
+  justify-content: flex-end;
+}
+
+.flex-1 {
+  flex: 1;
+}
+.flex-2 {
+  flex: 2;
+}
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+.align-center {
+  align-items: center;
+}
+
+.flex-wrap {
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.align-end {
+  -webkit-box-align: end;
+  -ms-flex-align: end;
+  align-items: flex-end;
+}
+
+.absolute-center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+
+.center {
+  margin: 0 auto;
+  -ms-flex-item-align: center;
+  -ms-grid-row-align: center;
+  align-self: center;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+.flex-row-reverse {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+}
+
+.flex-column-reverse {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: reverse;
+  -ms-flex-direction: column-reverse;
+  flex-direction: column-reverse;
+}
+
+.self-end {
+  -ms-flex-item-align: end;
+  align-self: flex-end;
+}
+.self-start {
+  -ms-flex-item-align: start;
+  align-self: flex-start;
+}
+.self-center {
+  -ms-flex-item-align: center;
+  -ms-grid-row-align: center;
+  align-self: center;
+}
+
+.gap-2 {
+  gap: 2px;
+}
+.gap-4 {
+  gap: 4px;
+}
+.gap-5 {
+  gap: 5px;
+}
+.gap-6 {
+  gap: 6px;
+}
+.gap-8 {
+  gap: 8px;
+}
+.gap-10 {
+  gap: 10px;
+}
+.gap-12 {
+  gap: 12px;
+}
+.gap-16 {
+  gap: 16px;
+}
+.gap-17 {
+  gap: 17px;
+}
+.gap-18 {
+  gap: 18px;
+}
+.gap-20 {
+  gap: 20px;
+}
+.gap-22 {
+  gap: 22px;
+}
+.gap-24 {
+  gap: 24px;
+}
+.gap-28 {
+  gap: 28px;
+}
+.gap-32 {
+  gap: 32px;
+}
+.gap-44 {
+  gap: 44px;
+}
+.gap-70 {
+  gap: 70px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.font-10 {
+  font-size: 10px;
+}
+.font-12 {
+  font-size: 12px;
+}
+
+.font-14 {
+  font-size: 14px;
+}
+.font-16 {
+  font-size: 16px;
+}
+.font-18 {
+  font-size: 18px;
+}
+.font-20 {
+  font-size: 20px;
+}
+.font-24 {
+  font-size: 24px;
+}
+.font-30 {
+  font-size: 30px;
+}
+
+.rtl {
+  direction: rtl;
+}
+.ltr {
+  direction: ltr;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.break-all {
+  word-break: break-all;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.formMessage {
+  text-align: center;
+  -webkit-transform: translateY(-55px);
+  -ms-transform: translateY(-55px);
+  transform: translateY(-55px);
+  direction: rtl;
+  color: rgb(118, 207, 118);
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+* ::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: transparent;
+  display: inline;
+  width: 1px !important;
+  height: 1px !important;
+  cursor: pointer;
+}
+* ::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: transparent;
+  display: inline;
+  cursor: pointer;
+}
+* ::-webkit-scrollbar {
+  width: 1px;
+  height: 2px;
+  color: transparent;
+  background: transparent;
+}

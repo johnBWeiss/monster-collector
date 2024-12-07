@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "ESNext",
+    "jsx": "react-jsx", // Updated for React 17+
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true, // Optional
+    "allowSyntheticDefaultImports": true, // Optional
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src", "declerations.d.ts"],
+  "lib": ["dom", "es6"] // Optional but recommended for modern browsers
+}
