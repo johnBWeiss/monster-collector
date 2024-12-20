@@ -4,33 +4,33 @@ import background from "../../assets/images/monsters/battlefield.webp";
 import yogi1Back from "../../assets/images/monsters/yogi1-back.png";
 import baddy1 from "../../assets/images/monsters/baddy-1.png";
 import fireball from "../../assets/images/monsters/fireball.png";
+import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
+import "./home.scss";
 
 export type HomeProps = {};
 
 export const Home: FC<HomeProps> = () => {
   const [fireballStyle, setFireballStyle] = useState({
-    bottom: "10px", // Adjust based on starting position
-    opacity: 0,
-    right: "0px",
+    display: "none",
   });
+  const audio = new Audio(fireballSound); // Create an audio instance
 
   // Function to trigger the fireball movement
   const shootFireball = () => {
+    audio.currentTime = 0; // Ensure sound starts from the beginning
+    audio.play();
     setFireballStyle({
-      right: "30px", // End near baddy-1
-      bottom: "100px",
-      opacity: 1, // Make it visible
+      display: "block",
     });
 
     // After the animation ends, reset the fireball
     setTimeout(() => {
       setFireballStyle({
-        bottom: "10px", // Adjust based on starting position
-        opacity: 0,
-        right: "0px",
+        display: "none",
       });
-    }, 1000); // Match the duration of the animation
+    }, 1200); // Match the duration of the animation
   };
+
   return (
     <PageSection>
       <img
@@ -44,28 +44,32 @@ export const Home: FC<HomeProps> = () => {
         }}
       />
       <div className="height-100 width-100 flex justify-center align-end">
-        <img
-          src={baddy1}
-          alt="yogi1-back"
+        <div
           style={{
             width: "190px",
             zIndex: 1,
             position: "relative",
             bottom: "100px",
           }}
-        />
-        <img
-          className="fireball"
-          src={fireball}
-          style={{
-            zIndex: 1,
-            width: "40px",
-            borderRadius: "50%",
-            transition: "all 1s ease-in-out", // Smooth animation
-            transform: `translate(${fireballStyle.right})`,
-            opacity: fireballStyle.opacity,
-          }}
-        />
+        >
+          <img src={baddy1} alt="yogi1-back" />
+          <img
+            className="fireball"
+            src={fireball}
+            style={{
+              zIndex: 1,
+              width: "40px",
+              borderRadius: "50%",
+              display: fireballStyle.display,
+              position: "absolute",
+              top: "50%",
+              right: 0,
+              left: 0,
+              margin: "0 auto",
+              // transition: "all 1s ease-in-out", // Smooth animation
+            }}
+          />
+        </div>
 
         <img
           onClick={() => shootFireball()}
