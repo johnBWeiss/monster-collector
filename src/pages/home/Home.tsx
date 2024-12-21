@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useRef, useState } from "react";
 import { PageSection } from "../../coreComponents/pageSection/PageSection";
 import background from "../../assets/images/monsters/battlefield.webp";
 import yogi1Back from "../../assets/images/monsters/yogi1-back.png";
@@ -13,22 +13,37 @@ export const Home: FC<HomeProps> = () => {
   const [fireballStyle, setFireballStyle] = useState({
     display: "none",
   });
-  const audio = new Audio(fireballSound); // Create an audio instance
+  const [shooterStyle, setShooterStyle] = useState({
+    transform: "translate(0, 0)",
+    transition: "transform 0.3s ease-out",
+  });
+  const audioRef = useRef(new Audio(fireballSound));
 
-  // Function to trigger the fireball movement
   const shootFireball = () => {
-    audio.currentTime = 0; // Ensure sound starts from the beginning
-    audio.play();
+    audioRef.current.currentTime = 0;
+    audioRef.current.play();
+
     setFireballStyle({
       display: "block",
     });
 
-    // After the animation ends, reset the fireball
+    setShooterStyle({
+      transform: "translate(-20px, -20px) rotate(-15deg)",
+      transition: "transform 0.3s ease-out",
+    });
+
+    setTimeout(() => {
+      setShooterStyle({
+        transform: "translate(0, 0) rotate(0deg)",
+        transition: "transform 0.3s ease-out",
+      });
+    }, 300);
+
     setTimeout(() => {
       setFireballStyle({
         display: "none",
       });
-    }, 1200); // Match the duration of the animation
+    }, 1000);
   };
 
   return (
@@ -49,10 +64,14 @@ export const Home: FC<HomeProps> = () => {
             width: "190px",
             zIndex: 1,
             position: "relative",
-            bottom: "100px",
+            bottom: "150px",
+            right: "50px",
           }}
         >
           <img src={baddy1} alt="yogi1-back" />
+        </div>
+
+        <div style={{ position: "relative" }}>
           <img
             className="fireball"
             src={fireball}
@@ -62,26 +81,24 @@ export const Home: FC<HomeProps> = () => {
               borderRadius: "50%",
               display: fireballStyle.display,
               position: "absolute",
-              top: "50%",
-              right: 0,
-              left: 0,
-              margin: "0 auto",
-              // transition: "all 1s ease-in-out", // Smooth animation
+              right: "20px", // Start near the shooter
+              bottom: "60px", // Align with shooter's height
+            }}
+          />
+          <img
+            onClick={shootFireball}
+            src={yogi1Back}
+            alt="yogi1-back"
+            style={{
+              width: "90px",
+              zIndex: 1,
+              position: "relative",
+              bottom: "50px",
+              cursor: "pointer",
+              ...shooterStyle,
             }}
           />
         </div>
-
-        <img
-          onClick={() => shootFireball()}
-          src={yogi1Back}
-          alt="yogi1-back"
-          style={{
-            width: "90px",
-            zIndex: 1,
-            position: "relative",
-            bottom: "10px",
-          }}
-        />
       </div>
     </PageSection>
   );

@@ -1,8 +1,9 @@
 .fireball {
-  animation: fireAnimation 1.2s infinite linear;
+  animation: shootAttack 1s infinite linear;
+  //animation: projectionAttack 1.2s infinite linear;
 }
 
-@keyframes fireAnimation {
+@keyframes projectionAttack {
   0% {
     transform: scale(0.5) rotate(0deg);
     opacity: 1;
@@ -24,3 +25,16 @@
     opacity: 0.4;
   }
 }
+
+@keyframes shootAttack {
+  0% {
+    transform: scale(0.2) translate(0, 0);
+
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-180px, -180px) scale(3.5);
+  }
+}
+
