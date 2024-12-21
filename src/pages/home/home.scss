@@ -1,7 +1,112 @@
+/* General Styles for Background and Players */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+img {
+  position: relative;
+  display: block;
+  max-width: 100%;
+}
+
+/* Battlefield Background */
+.battlefield {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  position: absolute;
+}
+
+/* User (Yogi) and Enemy (Baddy) */
+.user {
+  position: relative;
+  bottom: 50px;
+  z-index: 2;
+  width: 90px;
+  cursor: pointer;
+}
+
+.enemy {
+  position: relative;
+  bottom: 150px;
+  right: 50px;
+  z-index: 2;
+  width: 190px;
+  cursor: pointer;
+}
+
+/* Animations for Shaking and Recoil */
+.hit-recoil-left {
+  animation: hitRecoilLeft 0.5s ease-out;
+}
+
+@keyframes hitRecoilLeft {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-10px, -5px);
+  }
+  50% {
+    transform: translate(-15px, -10px);
+  }
+  75% {
+    transform: translate(-7px, -5px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+
+/* Projectile Animations */
+
+
+.projectile {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  display: none;
+
+  &.projectile-fireball {
+    background: url("../../assets/images/monsters/fireball.png") no-repeat center;
+    background-size: contain;
+    animation: fireball-animation 0.5s forwards;
+    display: block;
+  }
+
+  &.projectile-lightning {
+    //background: url("../../assets/images/monsters/lightning.png") no-repeat center;
+    background-size: contain;
+    animation: lightning-animation 0.3s forwards;
+    display: block;
+  }
+}
+
+@keyframes fireball-animation {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(200px);
+  }
+}
+
+@keyframes lightning-animation {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(200px);
+  }
+}
+
+/* General Animations */
 .fireball {
   animation: shootAttack 1s infinite linear;
 }
-
 
 .shake {
   animation: shake 0.5s ease-in-out;
@@ -11,36 +116,11 @@
   animation: hitRecoilLeft 0.5s ease-out; /* Smooth and quick recoil */
 }
 
-@keyframes projectionAttack {
-  0% {
-    transform: scale(0.5) rotate(0deg);
-    opacity: 1;
-  }
-  25% {
-    transform: scale(1.5) rotate(360deg);
-    opacity: 0.9;
-  }
-  50% {
-    transform: scale(3) rotate(720deg);
-    opacity: 0.8;
-  }
-  75% {
-    transform: scale(1.5) rotate(980deg);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(0.5) rotate(1440deg);
-    opacity: 0.4;
-  }
-}
-
 @keyframes shootAttack {
   0% {
     transform: scale(0.2) translate(0, 0);
-
     opacity: 1;
   }
-
   100% {
     transform: translate(-180px, -180px) scale(3.5);
   }
@@ -82,3 +162,59 @@
   }
 }
 
+@keyframes projectionAttack {
+  0% {
+    transform: scale(0.5) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.5) rotate(360deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(3) rotate(720deg);
+    opacity: 0.8;
+  }
+  75% {
+    transform: scale(1.5) rotate(980deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(0.5) rotate(1440deg);
+    opacity: 0.4;
+  }
+}
+
+/* Ability Selection UI */
+.abilities-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+
+  .ability {
+    margin: 0 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.3s;
+
+    img {
+      width: 50px;
+      height: 50px;
+      border: 2px solid transparent;
+      border-radius: 5px;
+    }
+
+    p {
+      margin-top: 5px;
+      font-size: 14px;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &.selected img {
+      border-color: gold;
+    }
+  }
+}
