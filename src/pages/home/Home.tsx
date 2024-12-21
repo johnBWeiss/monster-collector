@@ -9,6 +9,8 @@ import "./home.scss";
 
 export type HomeProps = {};
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const Home: FC<HomeProps> = () => {
   const [fireballStyle, setFireballStyle] = useState({
     display: "none",
@@ -17,33 +19,46 @@ export const Home: FC<HomeProps> = () => {
     transform: "translate(0, 0)",
     transition: "transform 0.3s ease-out",
   });
+  const [isShaking, setIsShaking] = useState(false);
   const audioRef = useRef(new Audio(fireballSound));
 
-  const shootFireball = () => {
-    audioRef.current.currentTime = 0;
-    audioRef.current.play();
+  const shootFireball = (): Promise<void> => {
+    return new Promise(async (resolve) => {
+      // Play sound
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
 
-    setFireballStyle({
-      display: "block",
-    });
+      // Start fireball animation
+      setFireballStyle({ display: "block" });
+      // Shooter animation
+      setShooterStyle({
+        transform: "translate(-20px, -20px) rotate(-15deg)",
+        transition: "transform 0.3s ease-out",
+      });
 
-    setShooterStyle({
-      transform: "translate(-20px, -20px) rotate(-15deg)",
-      transition: "transform 0.3s ease-out",
-    });
-
-    setTimeout(() => {
+      await delay(300); // Shooter animation duration
       setShooterStyle({
         transform: "translate(0, 0) rotate(0deg)",
         transition: "transform 0.3s ease-out",
       });
-    }, 300);
+      // Wait for fireball to reach the enemy
+      await delay(700);
+      // Hide the fireball
+      setFireballStyle({ display: "none" });
+      // Trigger enemy shaking
+      setIsShaking(true);
+      await delay(500); // Shake duration
+      setIsShaking(false);
 
-    setTimeout(() => {
-      setFireballStyle({
-        display: "none",
-      });
-    }, 1000);
+      // Resolve the promise to indicate the shooting sequence is complete
+      resolve();
+    });
+  };
+
+  const handleUserShoot = async () => {
+    console.log("Shooting started...");
+    await shootFireball();
+    console.log("Shooting completed!");
   };
 
   return (
@@ -67,8 +82,9 @@ export const Home: FC<HomeProps> = () => {
             bottom: "150px",
             right: "50px",
           }}
+          className={isShaking ? "hit-recoil-left" : ""}
         >
-          <img src={baddy1} alt="yogi1-back" />
+          <img src={baddy1} alt="enemy" />
         </div>
 
         <div style={{ position: "relative" }}>
@@ -86,7 +102,7 @@ export const Home: FC<HomeProps> = () => {
             }}
           />
           <img
-            onClick={shootFireball}
+            onClick={handleUserShoot}
             src={yogi1Back}
             alt="yogi1-back"
             style={{
@@ -95,7 +111,7 @@ export const Home: FC<HomeProps> = () => {
               position: "relative",
               bottom: "50px",
               cursor: "pointer",
-              ...shooterStyle,
+              ...shooterStyle, // Apply shooter animation styles
             }}
           />
         </div>

@@ -1,6 +1,13 @@
 .fireball {
   animation: shootAttack 1s infinite linear;
-  //animation: projectionAttack 1.2s infinite linear;
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.hit-recoil-left {
+  animation: hitRecoilLeft 0.5s ease-out; /* Smooth and quick recoil */
 }
 
 @keyframes projectionAttack {
@@ -35,6 +42,42 @@
 
   100% {
     transform: translate(-180px, -180px) scale(3.5);
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-5px, 5px);
+  }
+  50% {
+    transform: translate(5px, -5px);
+  }
+  75% {
+    transform: translate(-5px, -5px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes hitRecoilLeft {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-10px, -5px);
+  }
+  50% {
+    transform: translate(-15px, -10px);
+  }
+  75% {
+    transform: translate(-7px, -5px);
+  }
+  100% {
+    transform: translate(0, 0);
   }
 }
 
