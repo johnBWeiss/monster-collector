@@ -6,23 +6,47 @@ import baddy1 from "../../assets/images/monsters/baddy-1.png";
 import fireball from "../../assets/images/monsters/fireball.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
 import "./home.scss";
+import { Creature } from "../../LogicClasses/Creature/Creature";
 
 export type HomeProps = {};
-
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const Home: FC<HomeProps> = () => {
-  const [fireballStyle, setFireballStyle] = useState({
+  // React state for user and enemy health
+  const [userHP, setUserHP] = useState(100);
+  const [enemyHP, setEnemyHP] = useState(80);
+
+  const [userFireballStyle, setUserFireballStyle] = useState({
     display: "none",
   });
-  const [shooterStyle, setShooterStyle] = useState({
+  const [enemyFireballStyle, setEnemyFireballStyle] = useState({
+    display: "none",
+  });
+  const [userShooterStyle, setUserShooterStyle] = useState({
     transform: "translate(0, 0)",
     transition: "transform 0.3s ease-out",
   });
-  const [isShaking, setIsShaking] = useState(false);
+  const [enemyShooterStyle, setEnemyShooterStyle] = useState({
+    transform: "translate(0, 0)",
+    transition: "transform 0.3s ease-out",
+  });
+  const [isUserShaking, setIsUserShaking] = useState(false);
+  const [isEnemyShaking, setIsEnemyShaking] = useState(false);
+
   const audioRef = useRef(new Audio(fireballSound));
 
-  const shootFireball = (): Promise<void> => {
+  // Store Creature instances in refs to maintain consistency across renders
+  const user = useRef(new Creature("User", 100, 15, 5, setUserHP));
+  const enemy = useRef(new Creature("Enemy", 80, 10, 3, setEnemyHP));
+
+  const shootFireball = (
+    attacker: Creature,
+    target: Creature,
+    setFireballStyle: React.Dispatch<React.SetStateAction<{ display: string }>>,
+    setShooterStyle: React.Dispatch<
+      React.SetStateAction<{ transform: string; transition: string }>
+    >,
+    setTargetShaking: React.Dispatch<React.SetStateAction<boolean>>,
+  ): Promise<void> => {
     return new Promise(async (resolve) => {
       // Play sound
       audioRef.current.currentTime = 0;
@@ -32,23 +56,31 @@ export const Home: FC<HomeProps> = () => {
       setFireballStyle({ display: "block" });
       // Shooter animation
       setShooterStyle({
-        transform: "translate(-20px, -20px) rotate(-15deg)",
+        transform:
+          attacker === user.current
+            ? "translate(-20px, -20px) rotate(-15deg)"
+            : "translate(20px, -20px) rotate(15deg)",
         transition: "transform 0.3s ease-out",
       });
 
       await delay(300); // Shooter animation duration
       setShooterStyle({
-        transform: "translate(0, 0) rotate(0deg)",
+        transform: "translate(0, 0)",
         transition: "transform 0.3s ease-out",
       });
-      // Wait for fireball to reach the enemy
+
+      // Attack logic
+      attacker.attackCreature(target);
+
+      // Wait for fireball to reach the target
       await delay(700);
+
       // Hide the fireball
       setFireballStyle({ display: "none" });
-      // Trigger enemy shaking
-      setIsShaking(true);
+      // Trigger target shaking
+      setTargetShaking(true);
       await delay(500); // Shake duration
-      setIsShaking(false);
+      setTargetShaking(false);
 
       // Resolve the promise to indicate the shooting sequence is complete
       resolve();
@@ -56,9 +88,29 @@ export const Home: FC<HomeProps> = () => {
   };
 
   const handleUserShoot = async () => {
-    console.log("Shooting started...");
-    await shootFireball();
-    console.log("Shooting completed!");
+    if (user.current.isAlive && enemy.current.isAlive) {
+      console.log("User attacks!");
+      await shootFireball(
+        user.current,
+        enemy.current,
+        setUserFireballStyle,
+        setUserShooterStyle,
+        setIsEnemyShaking,
+      );
+    }
+  };
+
+  const handleEnemyShoot = async () => {
+    if (user.current.isAlive && enemy.current.isAlive) {
+      console.log("Enemy attacks!");
+      await shootFireball(
+        enemy.current,
+        user.current,
+        setEnemyFireballStyle,
+        setEnemyShooterStyle,
+        setIsUserShaking,
+      );
+    }
   };
 
   return (
@@ -74,20 +126,24 @@ export const Home: FC<HomeProps> = () => {
         }}
       />
       <div className="height-100 width-100 flex justify-center align-end">
+        {/* Enemy Section */}
         <div
+          onClick={handleEnemyShoot}
           style={{
             width: "190px",
             zIndex: 1,
             position: "relative",
             bottom: "150px",
             right: "50px",
+            cursor: "pointer",
+            ...enemyShooterStyle,
           }}
-          className={isShaking ? "hit-recoil-left" : ""}
+          className={isEnemyShaking ? "hit-recoil-left" : ""}
         >
           <img src={baddy1} alt="enemy" />
-        </div>
-
-        <div style={{ position: "relative" }}>
+          <p>
+            HP: {enemyHP} / {enemy.current.maxHitPoints}
+          </p>
           <img
             className="fireball"
             src={fireball}
@@ -95,23 +151,43 @@ export const Home: FC<HomeProps> = () => {
               zIndex: 1,
               width: "40px",
               borderRadius: "50%",
-              display: fireballStyle.display,
+              display: enemyFireballStyle.display,
               position: "absolute",
-              right: "20px", // Start near the shooter
-              bottom: "60px", // Align with shooter's height
+              left: "20px", // Start near the enemy
+              bottom: "60px", // Align with enemy's height
             }}
           />
+        </div>
+
+        {/* User Section */}
+        <div style={{ position: "relative" }}>
           <img
             onClick={handleUserShoot}
             src={yogi1Back}
             alt="yogi1-back"
             style={{
               width: "90px",
-              zIndex: 1,
+              zIndex: 2,
               position: "relative",
               bottom: "50px",
               cursor: "pointer",
-              ...shooterStyle, // Apply shooter animation styles
+              ...userShooterStyle, // Apply user shooter animation styles
+            }}
+          />
+          <p>
+            HP: {userHP} / {user.current.maxHitPoints}
+          </p>
+          <img
+            className="fireball"
+            src={fireball}
+            style={{
+              zIndex: 1,
+              width: "40px",
+              borderRadius: "50%",
+              display: userFireballStyle.display,
+              position: "absolute",
+              right: "20px", // Start near the user
+              bottom: "60px", // Align with user's height
             }}
           />
         </div>
