@@ -104,8 +104,29 @@ img {
 }
 
 /* General Animations */
+.user-projectile {
+  z-index: 1;
+  width: 40px;
+  border-radius: 50%;
+  position: absolute;
+  right: 20px;
+  bottom: 60px;
+  animation: shootAttack 1s infinite linear;
+  display: none;
+
+}
+
+
 .fireball {
   animation: shootAttack 1s infinite linear;
+}
+
+.display-none {
+  display: none;
+}
+
+.display-block {
+  display: block;
 }
 
 .shake {

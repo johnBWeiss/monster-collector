@@ -1,0 +1,22 @@
+.user-img {
+  width: 90px;
+  z-index: 2;
+  position: relative;
+  bottom: 50px;
+}
+
+.user-projectile {
+  z-index: 1;
+  width: 40px;
+  border-radius: 50%;
+  position: absolute;
+  right: 20px;
+  bottom: 60px;
+  animation: shootAttack 1s infinite linear;
+  display: none;
+
+  &.should-show-projectile {
+    display: block;
+  }
+
+}

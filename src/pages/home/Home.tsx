@@ -3,10 +3,11 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import background from "../../assets/images/monsters/battlefield.webp";
 import yogi1Back from "../../assets/images/monsters/yogi1-back.png";
 import baddy1 from "../../assets/images/monsters/baddy-1.png";
-import fireball from "../../assets/images/monsters/fireball.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
 import "./home.scss";
 import { Creature } from "../../Classes/Creature";
+import { User } from "../../components/User/User";
+import fireball from "../../assets/images/monsters/fireball.png";
 
 export type HomeProps = {};
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -14,13 +15,9 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export const Home: FC<HomeProps> = () => {
   const [userHP, setUserHP] = useState(100);
   const [enemyHP, setEnemyHP] = useState(80);
+  const [shouldShowUserProjectile, setShouldShowUserProjectile] =
+    useState(false);
 
-  const [userFireballStyle, setUserFireballStyle] = useState({
-    display: "none",
-  });
-  const [enemyFireballStyle, setEnemyFireballStyle] = useState({
-    display: "none",
-  });
   const [userShooterStyle, setUserShooterStyle] = useState({
     transform: "translate(0, 0)",
     transition: "transform 0.3s ease-out",
@@ -65,10 +62,7 @@ export const Home: FC<HomeProps> = () => {
     audioRef.current.currentTime = 0;
     audioRef.current.play();
 
-    // Start fireball animation
-    const setFireballStyle =
-      attacker === "user" ? setUserFireballStyle : setEnemyFireballStyle;
-    setFireballStyle({ display: "block" });
+    setShouldShowUserProjectile(true);
 
     // Shooter animation
     const setShooterStyle =
@@ -89,7 +83,7 @@ export const Home: FC<HomeProps> = () => {
 
     // Wait for fireball to hit
     await delay(700);
-    setFireballStyle({ display: "none" });
+    setShouldShowUserProjectile(false);
 
     // Target shaking animation
     const setTargetShaking =
@@ -133,51 +127,19 @@ export const Home: FC<HomeProps> = () => {
           <p>
             HP: {enemyHP} / {enemy.current.maxHitPoints}
           </p>
-          <img
-            className="fireball"
-            src={fireball}
-            style={{
-              zIndex: 1,
-              width: "40px",
-              borderRadius: "50%",
-              display: enemyFireballStyle.display,
-              position: "absolute",
-              left: "20px",
-              bottom: "60px",
-            }}
-          />
         </div>
 
         {/* User Section */}
         <div style={{ position: "relative" }}>
-          <img
-            onClick={handleUserShoot}
-            src={yogi1Back}
-            alt="yogi1-back"
-            style={{
-              width: "90px",
-              zIndex: 2,
-              position: "relative",
-              bottom: "50px",
-              cursor: "pointer",
-              ...userShooterStyle,
-            }}
-          />
           <p>
             HP: {userHP} / {user.current.maxHitPoints}
           </p>
-          <img
-            className="fireball"
-            src={fireball}
-            style={{
-              zIndex: 1,
-              width: "40px",
-              borderRadius: "50%",
-              display: userFireballStyle.display,
-              position: "absolute",
-              right: "20px",
-              bottom: "60px",
-            }}
+
+          <User
+            imgSrc={yogi1Back}
+            onClick={handleUserShoot}
+            projectileSrc={fireball}
+            shouldShowUserProjectile={shouldShowUserProjectile}
           />
         </div>
       </div>
