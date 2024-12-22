@@ -1,6 +1,6 @@
 import { PageSection } from "../../coreComponents/pageSection/PageSection";
 import React, { FC, useRef, useState } from "react";
-import background from "../../assets/images/monsters/battlefield.webp";
+import background from "../../assets/images/game/background.png";
 import yogi1Back from "../../assets/images/monsters/yogi1-back.png";
 import baddy1 from "../../assets/images/monsters/baddy-1.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
