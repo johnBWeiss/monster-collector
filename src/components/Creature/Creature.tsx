@@ -1,8 +1,8 @@
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 import React from "react";
-import "./user.scss";
+import "./creature.scss";
 
-export type UserProps = {
+export type CreatureProps = {
   imgSrc: string;
   projectileSrc: string;
   onClick: (event: React.MouseEvent) => void;
@@ -11,11 +11,11 @@ export type UserProps = {
   imgClassName?: string;
   projectileClassName?: string;
 };
-export const User: React.FC<UserProps> = ({
+export const Creature: React.FC<CreatureProps> = ({
   imgSrc,
   onClick,
   className,
-  imgClassName = "user-img",
+  imgClassName,
   shouldShowUserProjectile = false,
   projectileSrc,
 }) => {
@@ -28,15 +28,15 @@ export const User: React.FC<UserProps> = ({
     <div className={classNameParserCore(className)} onClick={onClick}>
       <img
         src={imgSrc}
-        className={classNameParserCore(imgClassName)}
-        alt={"user character"}
+        className={classNameParserCore("creature-img", imgClassName)}
+        alt={"creature"}
       />
       <img
-        className={classNameParserCore("user-projectile", {
+        className={classNameParserCore("creature-projectile", {
           "should-show-projectile": shouldShowUserProjectile,
         })}
         src={projectileSrc}
-        alt={"user-projectile"}
+        alt={"creature-projectile"}
       />
     </div>
   );

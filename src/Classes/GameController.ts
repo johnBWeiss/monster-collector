@@ -1,4 +1,4 @@
-import { Creature } from "./Creature";
+import { CreatureController } from "./CreatureController";
 import { EventEmitter } from "../coreClasses/EventEmitter";
 
 type GameEvents = {
@@ -7,7 +7,7 @@ type GameEvents = {
 
 export class GameController extends EventEmitter<GameEvents> {
   // Perform an attack and emit an event
-  handleAttack(attacker: Creature, target: Creature): void {
+  handleAttack(attacker: CreatureController, target: CreatureController): void {
     const damage = Math.max(
       attacker.getState().attack - target.getState().defense,
       0,

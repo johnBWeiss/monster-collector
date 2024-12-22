@@ -6,7 +6,7 @@ type CreatureEvents = {
   attack: { target: string; damage: number };
 };
 
-export class Creature extends EventEmitter<CreatureEvents> {
+export class CreatureController extends EventEmitter<CreatureEvents> {
   private attributes: {
     name: string;
     health: number;
@@ -41,7 +41,7 @@ export class Creature extends EventEmitter<CreatureEvents> {
     }
   }
 
-  attackCreature(target: Creature): void {
+  attackCreature(target: CreatureController): void {
     if (!target.isAlive) {
       console.warn(`${target.attributes.name} is already dead.`);
       return;

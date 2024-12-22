@@ -1,11 +1,18 @@
-.user-img {
+.creature-img {
   width: 90px;
   z-index: 2;
   position: relative;
   bottom: 50px;
+
+  &.is-enemy {
+    width: 190px;
+    right: 50px;
+    bottom: 150px;
+    z-index: 0;
+  }
 }
 
-.user-projectile {
+.creature-projectile {
   z-index: 1;
   width: 40px;
   border-radius: 50%;

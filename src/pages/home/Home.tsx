@@ -5,9 +5,10 @@ import yogi1Back from "../../assets/images/monsters/yogi1-back.png";
 import baddy1 from "../../assets/images/monsters/baddy-1.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
 import "./home.scss";
-import { Creature } from "../../Classes/Creature";
-import { User } from "../../components/User/User";
+import { CreatureController } from "../../Classes/CreatureController";
+import { Creature } from "../../components/Creature/Creature";
 import fireball from "../../assets/images/monsters/fireball.png";
+import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 
 export type HomeProps = {};
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -17,11 +18,9 @@ export const Home: FC<HomeProps> = () => {
   const [enemyHP, setEnemyHP] = useState(80);
   const [shouldShowUserProjectile, setShouldShowUserProjectile] =
     useState(false);
+  const [shouldShowEnemyProjectile, setShouldShowEnemyProjectile] =
+    useState(false);
 
-  const [userShooterStyle, setUserShooterStyle] = useState({
-    transform: "translate(0, 0)",
-    transition: "transform 0.3s ease-out",
-  });
   const [enemyShooterStyle, setEnemyShooterStyle] = useState({
     transform: "translate(0, 0)",
     transition: "transform 0.3s ease-out",
@@ -30,15 +29,15 @@ export const Home: FC<HomeProps> = () => {
   const [isEnemyShaking, setIsEnemyShaking] = useState(false);
 
   const audioRef = useRef(new Audio(fireballSound));
-  const user = useRef(new Creature("User", 100, 15, 5));
-  const enemy = useRef(new Creature("Enemy", 80, 10, 3));
+  const user = useRef(new CreatureController("Creature", 100, 15, 5));
+  const enemy = useRef(new CreatureController("Enemy", 80, 10, 3));
 
   useEffect(() => {
     // Subscribe to user events
     user.current.on("healthChange", (data: { health: number }) =>
       setUserHP(data.health),
     );
-    user.current.on("death", () => console.log("User has died"));
+    user.current.on("death", () => console.log("CreatureController has died"));
     user.current.on("attack", (data) => handleAttack("user", data.target));
 
     // Subscribe to enemy events
@@ -65,21 +64,21 @@ export const Home: FC<HomeProps> = () => {
     setShouldShowUserProjectile(true);
 
     // Shooter animation
-    const setShooterStyle =
-      attacker === "user" ? setUserShooterStyle : setEnemyShooterStyle;
-    setShooterStyle({
-      transform:
-        attacker === "user"
-          ? "translate(-20px, -20px) rotate(-15deg)"
-          : "translate(20px, -20px) rotate(15deg)",
-      transition: "transform 0.3s ease-out",
-    });
+    // const setShooterStyle =
+    //   attacker === "user" ? setUserShooterStyle : setEnemyShooterStyle;
+    // setShooterStyle({
+    //   transform:
+    //     attacker === "user"
+    //       ? "translate(-20px, -20px) rotate(-15deg)"
+    //       : "translate(20px, -20px) rotate(15deg)",
+    //   transition: "transform 0.3s ease-out",
+    // });
 
     await delay(300);
-    setShooterStyle({
-      transform: "translate(0, 0)",
-      transition: "transform 0.3s ease-out",
-    });
+    // setShooterStyle({
+    //   transform: "translate(0, 0)",
+    //   transition: "transform 0.3s ease-out",
+    // });
 
     // Wait for fireball to hit
     await delay(700);
@@ -110,32 +109,28 @@ export const Home: FC<HomeProps> = () => {
       <img src={background} alt="background" className="battlefield" />
       <div className="height-100 width-100 flex justify-center align-end">
         {/* Enemy Section */}
-        <div
-          onClick={handleEnemyShoot}
-          style={{
-            width: "190px",
-            zIndex: 1,
-            position: "relative",
-            bottom: "150px",
-            right: "50px",
-            cursor: "pointer",
-            ...enemyShooterStyle,
-          }}
-          className={isEnemyShaking ? "hit-recoil-left" : ""}
-        >
-          <img src={baddy1} alt="enemy" />
+        <div>
           <p>
             HP: {enemyHP} / {enemy.current.maxHitPoints}
           </p>
+          <Creature
+            imgSrc={baddy1}
+            onClick={handleEnemyShoot}
+            projectileSrc={fireball}
+            shouldShowUserProjectile={shouldShowEnemyProjectile}
+            imgClassName={"is-enemy"}
+            className={classNameParserCore("", {
+              "hit-recoil-left": isEnemyShaking,
+            })}
+          />
         </div>
 
-        {/* User Section */}
         <div style={{ position: "relative" }}>
           <p>
             HP: {userHP} / {user.current.maxHitPoints}
           </p>
 
-          <User
+          <Creature
             imgSrc={yogi1Back}
             onClick={handleUserShoot}
             projectileSrc={fireball}
