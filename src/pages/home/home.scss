@@ -19,23 +19,6 @@ img {
   position: absolute;
 }
 
-/* CreatureController (Yogi) and Enemy (Baddy) */
-.user {
-  position: relative;
-  bottom: 50px;
-  z-index: 2;
-  width: 90px;
-  cursor: pointer;
-}
-
-.enemy {
-  position: relative;
-  bottom: 150px;
-  right: 50px;
-  z-index: 2;
-  width: 190px;
-  cursor: pointer;
-}
 
 /* Animations for Shaking and Recoil */
 .hit-recoil-left {
@@ -71,8 +54,8 @@ img {
   display: none;
 
   &.projectile-fireball {
-    background: url("../../assets/images/monsters/fireball.png") no-repeat center;
-    background-size: contain;
+    //background: url("../../assets/images/abilities/fireball.png") no-repeat center;
+    //background-size: contain;
     animation: fireball-animation 0.5s forwards;
     display: block;
   }
@@ -133,19 +116,6 @@ img {
   animation: shake 0.5s ease-in-out;
 }
 
-.hit-recoil-left {
-  animation: hitRecoilLeft 0.5s ease-out; /* Smooth and quick recoil */
-}
-
-@keyframes shootAttack {
-  0% {
-    transform: scale(0.2) translate(0, 0);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-180px, -180px) scale(3.5);
-  }
-}
 
 @keyframes shake {
   0% {
@@ -165,23 +135,6 @@ img {
   }
 }
 
-@keyframes hitRecoilLeft {
-  0% {
-    transform: translate(0, 0);
-  }
-  25% {
-    transform: translate(-10px, -5px);
-  }
-  50% {
-    transform: translate(-15px, -10px);
-  }
-  75% {
-    transform: translate(-7px, -5px);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
 
 @keyframes projectionAttack {
   0% {

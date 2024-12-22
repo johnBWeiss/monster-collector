@@ -1,5 +1,5 @@
 import { PageSection } from "../../coreComponents/pageSection/PageSection";
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useRef, useState } from "react";
 import background from "../../assets/images/monsters/battlefield.webp";
 import yogi1Back from "../../assets/images/monsters/yogi1-back.png";
 import baddy1 from "../../assets/images/monsters/baddy-1.png";
@@ -7,100 +7,78 @@ import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
 import "./home.scss";
 import { CreatureController } from "../../Classes/CreatureController";
 import { Creature } from "../../components/Creature/Creature";
-import fireball from "../../assets/images/monsters/fireball.png";
+import fireball from "../../assets/images/abilities/fireball.png";
+import iceShards from "../../assets/images/abilities/iceShards.png";
+import { useCreatureAttributes } from "../../hooks/useCreatureAttributes";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 
-export type HomeProps = {};
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export const Home: FC = () => {
+  const audioRef = useRef(new Audio(fireballSound));
+  const user = useRef(new CreatureController("User", 100, 15, 5));
+  const enemy = useRef(new CreatureController("Enemy", 80, 10, 3));
 
-export const Home: FC<HomeProps> = () => {
-  const [userHP, setUserHP] = useState(100);
-  const [enemyHP, setEnemyHP] = useState(80);
-  const [shouldShowUserProjectile, setShouldShowUserProjectile] =
+  // Use the custom hook to dynamically reflect changes
+  const userAttributes = useCreatureAttributes(user.current);
+  const enemyAttributes = useCreatureAttributes(enemy.current);
+
+  const [shouldShowHeroProjectile, setShouldShowHeroProjectile] =
     useState(false);
   const [shouldShowEnemyProjectile, setShouldShowEnemyProjectile] =
     useState(false);
-
-  const [enemyShooterStyle, setEnemyShooterStyle] = useState({
-    transform: "translate(0, 0)",
-    transition: "transform 0.3s ease-out",
-  });
   const [isUserShaking, setIsUserShaking] = useState(false);
   const [isEnemyShaking, setIsEnemyShaking] = useState(false);
 
-  const audioRef = useRef(new Audio(fireballSound));
-  const user = useRef(new CreatureController("Creature", 100, 15, 5));
-  const enemy = useRef(new CreatureController("Enemy", 80, 10, 3));
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
 
-  useEffect(() => {
-    // Subscribe to user events
-    user.current.on("healthChange", (data: { health: number }) =>
-      setUserHP(data.health),
+  const handleAttack = async (
+    attacker: CreatureController,
+    target: CreatureController,
+    setProjectile: React.Dispatch<React.SetStateAction<boolean>>,
+    setTargetShaking: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => {
+    console.log(
+      `${attacker.getState().name} attacks ${target.getState().name}`,
     );
-    user.current.on("death", () => console.log("CreatureController has died"));
-    user.current.on("attack", (data) => handleAttack("user", data.target));
 
-    // Subscribe to enemy events
-    enemy.current.on("healthChange", (data: { health: number }) =>
-      setEnemyHP(data.health),
-    );
-    enemy.current.on("death", () => console.log("Enemy has died"));
-    enemy.current.on("attack", (data) => handleAttack("enemy", data.target));
-
-    return () => {
-      // Cleanup listeners
-      user.current.off("healthChange", () => setUserHP);
-      enemy.current.off("healthChange", () => setEnemyHP);
-    };
-  }, []);
-
-  const handleAttack = async (attacker: "user" | "enemy", target: string) => {
-    console.log(`${attacker} attacked ${target}`);
-
-    // Play sound
+    // Play attack sound
     audioRef.current.currentTime = 0;
     audioRef.current.play();
 
-    setShouldShowUserProjectile(true);
+    // Show projectile
+    setProjectile(true);
 
-    // Shooter animation
-    // const setShooterStyle =
-    //   attacker === "user" ? setUserShooterStyle : setEnemyShooterStyle;
-    // setShooterStyle({
-    //   transform:
-    //     attacker === "user"
-    //       ? "translate(-20px, -20px) rotate(-15deg)"
-    //       : "translate(20px, -20px) rotate(15deg)",
-    //   transition: "transform 0.3s ease-out",
-    // });
-
-    await delay(300);
-    // setShooterStyle({
-    //   transform: "translate(0, 0)",
-    //   transition: "transform 0.3s ease-out",
-    // });
-
-    // Wait for fireball to hit
-    await delay(700);
-    setShouldShowUserProjectile(false);
+    await delay(700); // Simulate projectile travel
+    setProjectile(false);
 
     // Target shaking animation
-    const setTargetShaking =
-      attacker === "user" ? setIsEnemyShaking : setIsUserShaking;
     setTargetShaking(true);
-    await delay(500);
+    await delay(500); // Simulate shaking
     setTargetShaking(false);
+
+    // Perform the attack
+    attacker.attackCreature(target);
   };
 
-  const handleUserShoot = () => {
+  const handleHeroShoot = () => {
     if (user.current.isAlive && enemy.current.isAlive) {
-      user.current.attackCreature(enemy.current);
+      handleAttack(
+        user.current,
+        enemy.current,
+        setShouldShowHeroProjectile,
+        setIsEnemyShaking,
+      );
     }
   };
 
   const handleEnemyShoot = () => {
     if (user.current.isAlive && enemy.current.isAlive) {
-      enemy.current.attackCreature(user.current);
+      handleAttack(
+        enemy.current,
+        user.current,
+        setShouldShowEnemyProjectile,
+        setIsUserShaking,
+      );
     }
   };
 
@@ -111,30 +89,33 @@ export const Home: FC<HomeProps> = () => {
         {/* Enemy Section */}
         <div>
           <p>
-            HP: {enemyHP} / {enemy.current.maxHitPoints}
+            HP: {enemyAttributes.health} / {enemy.current.maxHitPoints}
           </p>
           <Creature
             imgSrc={baddy1}
             onClick={handleEnemyShoot}
-            projectileSrc={fireball}
-            shouldShowUserProjectile={shouldShowEnemyProjectile}
-            imgClassName={"is-enemy"}
-            className={classNameParserCore("", {
+            projectileSrc={iceShards}
+            shouldShowProjectile={shouldShowEnemyProjectile}
+            isEnemy
+            className={classNameParserCore({
               "hit-recoil-left": isEnemyShaking,
             })}
           />
         </div>
 
-        <div style={{ position: "relative" }}>
+        {/* User Section */}
+        <div>
           <p>
-            HP: {userHP} / {user.current.maxHitPoints}
+            HP: {userAttributes.health} / {user.current.maxHitPoints}
           </p>
-
           <Creature
             imgSrc={yogi1Back}
-            onClick={handleUserShoot}
+            onClick={handleHeroShoot}
             projectileSrc={fireball}
-            shouldShowUserProjectile={shouldShowUserProjectile}
+            shouldShowProjectile={shouldShowHeroProjectile}
+            className={classNameParserCore({
+              "hit-recoil-right": isUserShaking,
+            })}
           />
         </div>
       </div>

@@ -1,18 +1,21 @@
 import { EventEmitter } from "../coreClasses/EventEmitter";
 
+type CreatureAttributes = {
+  name: string;
+  health: number;
+  attack: number;
+  defense: number;
+};
+
 type CreatureEvents = {
-  healthChange: { health: number };
-  death: { name: string };
-  attack: { target: string; damage: number };
+  attributeChange: Partial<CreatureAttributes>; // Generic attribute change event
+  healthChange: { health: number }; // Specific event for health changes
+  death: { name: string }; // Specific event for death
+  attack: { target: string; damage: number }; // Specific event for attacks
 };
 
 export class CreatureController extends EventEmitter<CreatureEvents> {
-  private attributes: {
-    name: string;
-    health: number;
-    attack: number;
-    defense: number;
-  };
+  private attributes: CreatureAttributes;
   public readonly maxHitPoints: number;
 
   constructor(name: string, health: number, attack: number, defense: number) {
@@ -25,19 +28,35 @@ export class CreatureController extends EventEmitter<CreatureEvents> {
     return this.attributes.health > 0;
   }
 
+  private updateAttributes(updates: Partial<CreatureAttributes>): void {
+    const updatedAttributes = { ...this.attributes, ...updates };
+
+    // Check and emit specific events for health changes
+    if (
+      updates.health !== undefined &&
+      updates.health !== this.attributes.health
+    ) {
+      this.emit("healthChange", { health: updates.health });
+      if (updates.health === 0) {
+        this.emit("death", { name: this.attributes.name });
+      }
+    }
+
+    this.attributes = updatedAttributes;
+
+    // Emit the generic attributeChange event
+    this.emit("attributeChange", updates);
+  }
+
   takeDamage(damage: number): void {
     if (damage <= 0 || isNaN(damage)) {
       throw new Error("Damage must be a positive number.");
     }
+    const oldHealth = this.attributes.health;
 
     const newHealth = Math.max(this.attributes.health - damage, 0);
-    if (newHealth !== this.attributes.health) {
-      this.attributes.health = newHealth;
-      this.emit("healthChange", { health: this.attributes.health });
-    }
-
-    if (this.attributes.health === 0) {
-      this.emit("death", { name: this.attributes.name });
+    if (newHealth !== oldHealth) {
+      this.updateAttributes({ health: newHealth });
     }
   }
 
@@ -64,18 +83,21 @@ export class CreatureController extends EventEmitter<CreatureEvents> {
       this.attributes.health + amount,
       this.maxHitPoints,
     );
-    if (newHealth !== this.attributes.health) {
-      this.attributes.health = newHealth;
-      this.emit("healthChange", { health: this.attributes.health });
-    }
+    this.updateAttributes({ health: newHealth });
   }
 
   resetHealth(): void {
-    this.attributes.health = this.maxHitPoints;
-    this.emit("healthChange", { health: this.attributes.health });
+    this.updateAttributes({ health: this.maxHitPoints });
   }
 
-  getState(): Readonly<typeof this.attributes> {
+  updateStat(stat: keyof CreatureAttributes, value: number): void {
+    if (stat === "health") {
+      throw new Error("Use heal or takeDamage to modify health.");
+    }
+    this.updateAttributes({ [stat]: value });
+  }
+
+  getState(): Readonly<CreatureAttributes> {
     return { ...this.attributes };
   }
 }

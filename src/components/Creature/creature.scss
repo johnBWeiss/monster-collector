@@ -19,11 +19,82 @@
   position: absolute;
   right: 20px;
   bottom: 60px;
-  animation: shootAttack 1s infinite linear;
+  animation: heroAttack 1s infinite linear;
   display: none;
 
   &.should-show-projectile {
     display: block;
   }
 
+  &.is-enemy {
+    animation: enemyAttack 1s infinite linear;
+    bottom: 220px;
+    right: 130px
+
+  }
+
+}
+
+.hit-recoil-left {
+  animation: hitRecoilLeft 0.5s ease-out; /* Smooth and quick recoil */
+}
+
+.hit-recoil-right {
+  animation: hitRecoilRight 0.5s ease-in-out;
+}
+
+@keyframes heroAttack {
+  0% {
+    transform: scale(0.2) translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-180px, -180px) scale(3.5);
+  }
+}
+
+@keyframes enemyAttack {
+  0% {
+    transform: scale(0.2) translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(280px, 180px) scale(3.5);
+  }
+}
+
+@keyframes hitRecoilLeft {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-10px, -5px);
+  }
+  50% {
+    transform: translate(-15px, -10px);
+  }
+  75% {
+    transform: translate(-7px, -5px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes hitRecoilRight {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(10px, 5px);
+  }
+  50% {
+    transform: translate(15px, 10px);
+  }
+  75% {
+    transform: translate(7px, 5px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }

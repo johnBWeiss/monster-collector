@@ -1,28 +1,32 @@
-type InputType = string | string[] | Record<string, boolean> | undefined | null;
+type InputType =
+  | string
+  | string[]
+  | Record<string, boolean | undefined>
+  | undefined
+  | null;
 
-export const classNameParserCore = (
-  firstString?: string,
-  input?: InputType
-): string => {
-  const appendArray = (arr: string[]) => arr.filter(Boolean).join(" ");
-  const appendObject = (obj: Record<string, boolean>) =>
+export const classNameParserCore = (...args: InputType[]): string => {
+  const appendArray = (arr: string[]): string => arr.filter(Boolean).join(" ");
+
+  const appendObject = (obj: Record<string, boolean | undefined>): string =>
     Object.keys(obj)
-      .filter((key) => obj[key])
+      .filter((key) => obj[key]) // Include keys with truthy values
       .join(" ");
 
-  // Check the type of input and handle falsy values
-  const result = [
-    firstString || "",
-    Array.isArray(input)
-      ? appendArray(input)
-      : typeof input === "object" && input !== null
-      ? appendObject(input)
-      : typeof input === "string"
-      ? input.trim()
-      : null, // In case of undefined, null, or other falsy values
-  ]
-    .filter(Boolean) // Filter out any empty, falsy, or invalid values
-    .join(" ");
+  const processInput = (input: InputType): string => {
+    if (Array.isArray(input)) {
+      return appendArray(input);
+    } else if (typeof input === "object" && input !== null) {
+      return appendObject(input);
+    } else if (typeof input === "string") {
+      return input.trim();
+    }
+    return ""; // For undefined, null, or other falsy values
+  };
 
-  return result;
+  // Process all arguments and join the results with a space
+  return args
+    .map(processInput)
+    .filter(Boolean) // Remove falsy or empty values
+    .join(" ");
 };
