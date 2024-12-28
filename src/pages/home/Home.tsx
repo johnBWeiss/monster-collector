@@ -14,8 +14,8 @@ import { classNameParserCore } from "../../coreFunctions/classNameParserCore/cla
 
 export const Home: FC = () => {
   const audioRef = useRef(new Audio(fireballSound));
-  const user = useRef(new CreatureController("User", 100, 15, 5));
-  const enemy = useRef(new CreatureController("Enemy", 80, 10, 3));
+  const user = useRef(new CreatureController("User", 100, 100, 15, 5));
+  const enemy = useRef(new CreatureController("Enemy", 80, 80, 10, 3));
 
   // Use the custom hook to dynamically reflect changes
   const userAttributes = useCreatureAttributes(user.current);
@@ -81,43 +81,38 @@ export const Home: FC = () => {
       );
     }
   };
-
+  console.log(enemyAttributes);
   return (
     <PageSection>
       <img src={background} alt="background" className="battlefield" />
-      <div className="height-100 width-100 flex justify-center align-end">
+      <div className="creatures-container">
         {/* Enemy Section */}
-        <div>
-          <p>
-            HP: {enemyAttributes.health} / {enemy.current.maxHitPoints}
-          </p>
-          <Creature
-            imgSrc={baddy1}
-            onClick={handleEnemyShoot}
-            projectileSrc={iceShards}
-            shouldShowProjectile={shouldShowEnemyProjectile}
-            isEnemy
-            className={classNameParserCore({
-              "hit-recoil-left": isEnemyShaking,
-            })}
-          />
-        </div>
+
+        <Creature
+          imgSrc={baddy1}
+          onClick={handleEnemyShoot}
+          projectileSrc={iceShards}
+          shouldShowProjectile={shouldShowEnemyProjectile}
+          isEnemy
+          className={classNameParserCore("m-right-auto", {
+            "hit-recoil-left": isEnemyShaking,
+          })}
+          currentHealth={enemyAttributes.currentHealth}
+          maxHealth={enemyAttributes.maxHealth}
+        />
 
         {/* User Section */}
-        <div>
-          <p>
-            HP: {userAttributes.health} / {user.current.maxHitPoints}
-          </p>
-          <Creature
-            imgSrc={yogi1Back}
-            onClick={handleHeroShoot}
-            projectileSrc={fireball}
-            shouldShowProjectile={shouldShowHeroProjectile}
-            className={classNameParserCore({
-              "hit-recoil-right": isUserShaking,
-            })}
-          />
-        </div>
+        <Creature
+          imgSrc={yogi1Back}
+          onClick={handleHeroShoot}
+          projectileSrc={fireball}
+          shouldShowProjectile={shouldShowHeroProjectile}
+          className={classNameParserCore("m-left-auto", {
+            "hit-recoil-right": isUserShaking,
+          })}
+          currentHealth={userAttributes.currentHealth}
+          maxHealth={userAttributes.maxHealth}
+        />
       </div>
     </PageSection>
   );

@@ -17,8 +17,17 @@ img {
   height: 100vh;
   object-fit: cover;
   position: absolute;
+
 }
 
+.creatures-container {
+  height: 350px;
+  width: 370px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
 
 /* Animations for Shaking and Recoil */
 .hit-recoil-left {

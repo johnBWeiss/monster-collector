@@ -1,6 +1,7 @@
 @use "./colors.scss";
 @use "./variables.scss";
 @use "./flexStyles.scss";
+
 html {
   width: 100%;
   height: 100%;
@@ -8,6 +9,7 @@ html {
   padding: 0 !important;
   position: relative;
 }
+
 body {
   margin: 0 !important;
   padding: 0 !important;
@@ -42,6 +44,7 @@ img {
   -webkit-animation-duration: 0.5s;
   animation-duration: 0.5s;
 }
+
 @-webkit-keyframes fade-in {
   0% {
     opacity: 0;
@@ -53,6 +56,7 @@ img {
     opacity: 1;
   }
 }
+
 @keyframes fade-in {
   0% {
     opacity: 0;
@@ -100,30 +104,45 @@ img {
   padding-right: 10px;
   padding-left: 10px;
 }
+
 .p-top-40 {
   padding-top: 40px;
 }
+
 .p-top-50 {
   padding-top: 50px;
 }
+
 .p-top-100 {
   padding-top: 100px;
 }
+
 .p-top-150 {
   padding-top: 150px;
 }
+
 .p-top-200 {
   padding-top: 200px;
 }
+
 .p-top-300 {
   padding-top: 300px;
 }
+
 .p-bottom-50 {
   padding-bottom: 50px;
 }
 
 .height-100 {
   height: 100%;
+}
+
+.m-left-auto {
+  margin-left: auto;
+}
+
+.m-right-auto {
+  margin-right: auto;
 }
 
 .border-radius-16 {
@@ -133,9 +152,11 @@ img {
 .width-100 {
   width: 100%;
 }
+
 .width-80 {
   width: 80%;
 }
+
 .width-50 {
   width: 50%;
 }

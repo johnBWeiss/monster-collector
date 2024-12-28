@@ -1,43 +1,83 @@
-import React, { useState, useEffect } from "react";
-import "./progress-bar.scss"; // Import the CSS for styling
+import React, { useEffect, useState } from "react";
+import "./progress-bar.scss";
+import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore"; // Import the CSS for styling
 
 interface NeonProgressBarProps {
-  progress: number;
+  current: number; // Current value (e.g., health)
+  max: number; // Maximum value
   fillColor?: string;
   backgroundColor?: string;
   height?: string;
   label?: string;
   showPercentage?: boolean;
+  className?: string;
 }
 
 export const ProgressBarCore: React.FC<NeonProgressBarProps> = ({
-  progress = 0,
+  current = 0,
+  max = 100,
   fillColor,
   backgroundColor = "#e0e0e0",
-  height = "20px",
+  height = "12px",
   label,
   showPercentage = false,
+  className,
 }) => {
-  const [currentProgress, setCurrentProgress] = useState<number>(0);
+  const [percentage, setPercentage] = useState<number>(0);
+  const [highlightWidth, setHighlightWidth] = useState<number>(0); // Highlighted decrease section
+  const [prevPercentage, setPrevPercentage] = useState<number>(0);
 
   useEffect(() => {
-    setCurrentProgress(progress);
-  }, [progress]);
+    if (max > 0) {
+      const newPercentage = (current / max) * 100;
+
+      if (newPercentage < prevPercentage) {
+        setHighlightWidth(prevPercentage - newPercentage); // Set highlight width to show the decrease
+        setTimeout(() => setHighlightWidth(0), 1000); // Gradually recede the highlight
+      }
+
+      setPercentage(newPercentage);
+      setPrevPercentage(newPercentage);
+    } else {
+      setPercentage(0);
+    }
+  }, [current, max]);
 
   return (
-    <div className="progress-container" style={{ backgroundColor, height }}>
+    <div
+      className={classNameParserCore("progress-container relative", className)}
+      style={{ backgroundColor, height }}
+    >
+      {/* Main progress bar */}
       <div
         className="progress-bar"
         style={{
-          width: `${currentProgress}%`,
+          width: `${percentage}%`,
           backgroundColor: fillColor,
           height: "100%",
         }}
       >
         <span className="glow-text">{label}</span>
       </div>
+
+      {/* Highlighted decrease section */}
+      {highlightWidth > 0 && (
+        <div
+          className="progress-bar"
+          style={{
+            width: `${highlightWidth}%`,
+            backgroundColor: "red",
+            height: `100%`,
+            position: "absolute",
+            right: `${100 - percentage - highlightWidth}%`, // Align the red section to the decrease
+            top: 0,
+          }}
+        />
+      )}
+
+      {/* Percentage display */}
       {showPercentage && (
-        <span className="percentage-label">{`${currentProgress}%`}</span>
+        <span className="percentage-label">{`${Math.round(percentage)}%`}</span>
       )}
     </div>
   );
