@@ -33,7 +33,11 @@ export const ProgressBarCore: React.FC<NeonProgressBarProps> = ({
 
       if (newPercentage < prevPercentage) {
         setHighlightWidth(prevPercentage - newPercentage); // Set highlight width to show the decrease
-        setTimeout(() => setHighlightWidth(0), 1000); // Gradually recede the highlight
+        setTimeout(() => {
+          debugger;
+          setHighlightWidth(0);
+          debugger;
+        }, 1000); // Gradually recede the highlight
       }
 
       setPercentage(newPercentage);
@@ -61,19 +65,23 @@ export const ProgressBarCore: React.FC<NeonProgressBarProps> = ({
       </div>
 
       {/* Highlighted decrease section */}
-      {highlightWidth > 0 && (
-        <div
-          className="progress-bar"
-          style={{
-            width: `${highlightWidth}%`,
-            backgroundColor: "red",
-            height: `100%`,
-            position: "absolute",
-            right: `${100 - percentage - highlightWidth}%`, // Align the red section to the decrease
-            top: 0,
-          }}
-        />
-      )}
+
+      <div
+        className={classNameParserCore(
+          {
+            "progress-bar": !highlightWidth,
+          },
+          className,
+        )}
+        style={{
+          width: `${highlightWidth}%`,
+          backgroundColor: "red",
+          height: `100%`,
+          position: "absolute",
+          right: `${100 - percentage - highlightWidth}%`, // Align the red section to the decrease
+          top: 0,
+        }}
+      />
 
       {/* Percentage display */}
       {showPercentage && (

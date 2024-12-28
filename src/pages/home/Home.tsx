@@ -51,13 +51,13 @@ export const Home: FC = () => {
     await delay(700); // Simulate projectile travel
     setProjectile(false);
 
+    // Perform the attack
+    attacker.attackCreature(target);
+
     // Target shaking animation
     setTargetShaking(true);
     await delay(500); // Simulate shaking
     setTargetShaking(false);
-
-    // Perform the attack
-    attacker.attackCreature(target);
   };
 
   const handleHeroShoot = () => {
