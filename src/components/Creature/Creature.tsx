@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 import "./creature.scss";
 import { ProgressBarCore } from "../../coreComponents/progressBarCore/ProgressBarCore";
@@ -27,32 +27,6 @@ export const Creature: React.FC<CreatureProps> = ({
   currentHealth,
   maxHealth,
 }) => {
-  const [progressBarColor, setProgressBarColor] = useState<string>("");
-
-  useEffect(() => {
-    const healthPercentage = (currentHealth / maxHealth) * 100;
-
-    if (isEnemy) {
-      // Enemy-specific colors
-      if (healthPercentage >= 80) {
-        setProgressBarColor("darkgreen");
-      } else if (healthPercentage >= 50) {
-        setProgressBarColor("darkorange");
-      } else {
-        setProgressBarColor("darkred");
-      }
-    } else {
-      // Hero-specific colors
-      if (healthPercentage >= 80) {
-        setProgressBarColor("lightgreen");
-      } else if (healthPercentage >= 50) {
-        setProgressBarColor("gold");
-      } else {
-        setProgressBarColor("red");
-      }
-    }
-  }, [currentHealth, maxHealth, isEnemy]);
-
   return (
     <div
       className={classNameParserCore("relative fit-content", className)}
@@ -65,7 +39,7 @@ export const Creature: React.FC<CreatureProps> = ({
           className={classNameParserCore("creature-life-bar", {
             "is-enemy": isEnemy,
           })}
-          fillColor={progressBarColor}
+          fillColor={"green"}
         />
       )}
       <img
