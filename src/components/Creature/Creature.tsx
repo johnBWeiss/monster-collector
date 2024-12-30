@@ -1,7 +1,7 @@
 import React from "react";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 import "./creature.scss";
-import { ProgressBarCore } from "../../coreComponents/progressBarCore/ProgressBarCore";
+import { CreatureStats } from "./components/CreatureStats/CreatureStats";
 
 export type CreatureProps = {
   imgSrc: string;
@@ -29,17 +29,20 @@ export const Creature: React.FC<CreatureProps> = ({
 }) => {
   return (
     <div
-      className={classNameParserCore("relative fit-content", className)}
+      className={classNameParserCore(
+        "creature-container relative fit-content",
+        className,
+      )}
       onClick={onClick}
     >
       {(currentHealth || currentHealth === 0) && (
-        <ProgressBarCore
-          current={currentHealth}
-          max={maxHealth}
-          className={classNameParserCore("creature-life-bar", {
-            "is-enemy": isEnemy,
-          })}
-          fillColor={"green"}
+        <CreatureStats
+          currentHealth={currentHealth}
+          maxHealth={maxHealth}
+          isEnemy={isEnemy}
+          name={"test"}
+          xp={99}
+          level={4}
         />
       )}
       <img
