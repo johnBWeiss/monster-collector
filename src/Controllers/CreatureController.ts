@@ -9,10 +9,10 @@ type CreatureAttributes = {
 };
 
 type CreatureEvents = {
-  attributeChange: Partial<CreatureAttributes>; // Generic attribute change event
-  healthChange: { health: number }; // Specific event for health changes
-  death: { name: string }; // Specific event for death
-  attack: { target: string; damage: number }; // Specific event for attacks
+  attributeChange: Partial<CreatureAttributes>;
+  healthChange: { health: number };
+  death: { name: string };
+  attack: { target: string; damage: number };
 };
 
 export class CreatureController extends EventEmitter<CreatureEvents> {
@@ -36,7 +36,6 @@ export class CreatureController extends EventEmitter<CreatureEvents> {
   private updateAttributes(updates: Partial<CreatureAttributes>): void {
     const updatedAttributes = { ...this.attributes, ...updates };
 
-    // Check and emit specific events for health changes
     if (
       updates.currentHealth !== undefined &&
       updates.currentHealth !== this.attributes.currentHealth
@@ -48,8 +47,6 @@ export class CreatureController extends EventEmitter<CreatureEvents> {
     }
 
     this.attributes = updatedAttributes;
-
-    // Emit the generic attributeChange event
     this.emit("attributeChange", updates);
   }
 
@@ -57,12 +54,8 @@ export class CreatureController extends EventEmitter<CreatureEvents> {
     if (damage <= 0 || isNaN(damage)) {
       throw new Error("Damage must be a positive number.");
     }
-    const oldHealth = this.attributes.currentHealth;
-
     const newHealth = Math.max(this.attributes.currentHealth - damage, 0);
-    if (newHealth !== oldHealth) {
-      this.updateAttributes({ ...this.attributes, currentHealth: newHealth });
-    }
+    this.updateAttributes({ currentHealth: newHealth });
   }
 
   attackCreature(target: CreatureController): void {

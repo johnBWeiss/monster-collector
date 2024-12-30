@@ -1,23 +1,27 @@
 import { PageSection } from "../../coreComponents/pageSection/PageSection";
-import React, { FC, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import background from "../../assets/images/game/background.png";
 import yogi1Back from "../../assets/images/monsters/yogi1-back.png";
 import baddy1 from "../../assets/images/monsters/baddy-1.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
 import "./home.scss";
-import { CreatureController } from "../../Classes/CreatureController";
+import { CreatureController } from "../../Controllers/CreatureController";
+import { GameController } from "../../Controllers/GameController";
 import { Creature } from "../../components/Creature/Creature";
 import fireball from "../../assets/images/abilities/fireball.png";
 import iceShards from "../../assets/images/abilities/iceShards.png";
 import { useCreatureAttributes } from "../../hooks/useCreatureAttributes";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
+import { popUpController } from "../../Controllers/PopUpController";
 
 export const Home: FC = () => {
   const audioRef = useRef(new Audio(fireballSound));
   const user = useRef(new CreatureController("User", 100, 100, 15, 5));
   const enemy = useRef(new CreatureController("Enemy", 80, 80, 10, 3));
+  const gameController = useRef(
+    new GameController(user.current, enemy.current),
+  );
 
-  // Use the custom hook to dynamically reflect changes
   const userAttributes = useCreatureAttributes(user.current);
   const enemyAttributes = useCreatureAttributes(enemy.current);
 
@@ -27,6 +31,7 @@ export const Home: FC = () => {
     useState(false);
   const [isUserShaking, setIsUserShaking] = useState(false);
   const [isEnemyShaking, setIsEnemyShaking] = useState(false);
+  const [isTurnLocked, setIsTurnLocked] = useState(false); // Lock to prevent multiple actions in a turn
 
   const delay = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -37,6 +42,9 @@ export const Home: FC = () => {
     setProjectile: React.Dispatch<React.SetStateAction<boolean>>,
     setTargetShaking: React.Dispatch<React.SetStateAction<boolean>>,
   ) => {
+    if (isTurnLocked) return;
+    setIsTurnLocked(true);
+
     console.log(
       `${attacker.getState().name} attacks ${target.getState().name}`,
     );
@@ -47,7 +55,6 @@ export const Home: FC = () => {
 
     // Show projectile
     setProjectile(true);
-
     await delay(700); // Simulate projectile travel
     setProjectile(false);
 
@@ -58,10 +65,15 @@ export const Home: FC = () => {
     setTargetShaking(true);
     await delay(500); // Simulate shaking
     setTargetShaking(false);
+
+    setIsTurnLocked(false);
+
+    // Switch turns after the attack
+    gameController.current.switchTurn();
   };
 
   const handleHeroShoot = () => {
-    if (user.current.isAlive && enemy.current.isAlive) {
+    if (gameController.current.getTurn() === "user" && !isTurnLocked) {
       handleAttack(
         user.current,
         enemy.current,
@@ -71,26 +83,70 @@ export const Home: FC = () => {
     }
   };
 
-  const handleEnemyShoot = () => {
-    if (user.current.isAlive && enemy.current.isAlive) {
-      handleAttack(
-        enemy.current,
-        user.current,
-        setShouldShowEnemyProjectile,
-        setIsUserShaking,
-      );
-    }
-  };
-  console.log(enemyAttributes);
+  useEffect(() => {
+    const handleTurnChange = async ({
+      currentTurn,
+    }: {
+      currentTurn: "user" | "enemy";
+    }) => {
+      console.log(`Turn switched to: ${currentTurn}`);
+      if (
+        currentTurn === "enemy" &&
+        enemy.current.isAlive &&
+        user.current.isAlive
+      ) {
+        await delay(300); // Add a delay before the enemy attacks
+        handleAttack(
+          enemy.current,
+          user.current,
+          setShouldShowEnemyProjectile,
+          setIsUserShaking,
+        );
+      }
+    };
+
+    const handleGameOver = ({ winner }: { winner: "user" | "enemy" }) => {
+      popUpController.emit("showPopUp", {
+        id: "gameOverPopup",
+        content: (
+          <div>
+            <h2>{winner === "user" ? "You Win!" : "You Lose!"}</h2>
+            <button
+              onClick={() =>
+                popUpController.emit("closePopUp", { id: "gameOverPopup" })
+              }
+              style={{
+                padding: "10px",
+                background: "blue",
+                color: "white",
+                borderRadius: "5px",
+                marginTop: "10px",
+              }}
+            >
+              Close
+            </button>
+          </div>
+        ),
+      });
+    };
+
+    gameController.current.on("turnChange", handleTurnChange);
+    gameController.current.on("gameOver", handleGameOver);
+
+    return () => {
+      gameController.current.off("turnChange", handleTurnChange);
+      gameController.current.off("gameOver", handleGameOver);
+    };
+  }, []);
+
   return (
     <PageSection>
       <img src={background} alt="background" className="battlefield" />
       <div className="creatures-container">
         {/* Enemy Section */}
-
         <Creature
           imgSrc={baddy1}
-          onClick={handleEnemyShoot}
+          onClick={() => console.warn("Enemy can't be clicked!")}
           projectileSrc={iceShards}
           shouldShowProjectile={shouldShowEnemyProjectile}
           isEnemy
@@ -100,7 +156,6 @@ export const Home: FC = () => {
           currentHealth={enemyAttributes.currentHealth}
           maxHealth={enemyAttributes.maxHealth}
         />
-
         {/* User Section */}
         <Creature
           imgSrc={yogi1Back}

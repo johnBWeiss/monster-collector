@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CreatureController } from "../Classes/CreatureController";
+import { CreatureController } from "../Controllers/CreatureController";
 
 export const useCreatureAttributes = (creature: CreatureController) => {
   const [attributes, setAttributes] = useState(creature.getState());

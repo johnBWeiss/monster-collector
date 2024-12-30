@@ -34,10 +34,8 @@ export const ProgressBarCore: React.FC<NeonProgressBarProps> = ({
       if (newPercentage < prevPercentage) {
         setHighlightWidth(prevPercentage - newPercentage); // Set highlight width to show the decrease
         setTimeout(() => {
-          debugger;
           setHighlightWidth(0);
-          debugger;
-        }, 1000); // Gradually recede the highlight
+        }, 300); // Gradually recede the highlight
       }
 
       setPercentage(newPercentage);
