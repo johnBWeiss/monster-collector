@@ -5,28 +5,34 @@ interface AbilityCardProps {
   imgSrc: string; // Source of the image
   altText?: string; // Alt text for the image
   onClick?: () => void; // Optional onClick handler
-  attacksLeft?: number; // Number of attacks left
+  attacksLeft?: number | "infinite"; // Number of attacks left or "infinite"
+  disabled?: boolean; // Disables the card if true
 }
 
 export const AbilityCard: FC<AbilityCardProps> = ({
   imgSrc,
-  altText = "Ability Card", // Default alt text
+  altText = "Ability Card",
   onClick,
   attacksLeft,
+  disabled = false,
 }) => {
   return (
     <div
-      className="ability-card"
-      onClick={onClick}
+      className={`ability-card ${disabled ? "disabled" : ""}`}
+      onClick={!disabled ? onClick : undefined} // Prevent clicks if disabled
       role="button"
-      aria-label={altText} // Accessibility
-      tabIndex={0} // Makes it focusable
-      onKeyDown={(e) => e.key === "Enter" && onClick?.()} // Supports keyboard interaction
+      aria-disabled={disabled} // Accessibility
+      tabIndex={disabled ? -1 : 0} // Prevent focus if disabled
     >
-      <img src={imgSrc} alt={altText} className="ability-card__image" />
-      {attacksLeft !== undefined && (
-        <div className="ability-card__attacks-left">{attacksLeft}</div>
-      )}
+      <img
+        src={imgSrc}
+        alt={altText}
+        className="ability-card__image"
+        style={{ opacity: disabled ? 0.5 : 1 }} // Visually indicate disabled state
+      />
+      <div className="ability-card__attacks-left">
+        {attacksLeft ? attacksLeft : "∞"}
+      </div>
     </div>
   );
 };

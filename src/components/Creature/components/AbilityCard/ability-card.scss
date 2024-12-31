@@ -10,16 +10,25 @@
   justify-content: center;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
 
   &:hover {
-    //transform: scale(1.05); /* Slight zoom on hover */
+    transform: scale(1.05); /* Slight zoom on hover */
     cursor: pointer; /* Optional pointer cursor */
+  }
+
+  &.disabled {
+    cursor: not-allowed; /* Indicate the card is disabled */
+    pointer-events: none; /* Prevent interaction */
+    filter: grayscale(100%); /* Make the card appear gray */
+    opacity: 0.6; /* Dim the card for visual feedback */
   }
 
   &__image {
     width: 100%; /* Ensure image fills the card */
     height: 100%;
     object-fit: cover; /* Ensure the image scales nicely */
+    border-radius: 12px; /* Match the card's rounded edges */
   }
 
   &__attacks-left {

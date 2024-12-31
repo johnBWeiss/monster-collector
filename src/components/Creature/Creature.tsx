@@ -61,16 +61,18 @@ export const Creature: React.FC<CreatureProps> = ({
                 imgSrc={fireballIcon}
                 attacksLeft={powers.primary.count}
                 onClick={() => onAbilityUse("primary")} // Use Primary Power
+                disabled={powers.primary.count <= 0} // Disable if no power left
               />
               <AbilityCard
                 imgSrc={fireballIcon}
-                attacksLeft={powers.secondary.count}
                 onClick={() => onAbilityUse("secondary")} // Use Secondary Power
+                disabled={false} // Never disable secondary power
               />
               <AbilityCard
                 imgSrc={fireballIcon}
                 attacksLeft={powers.healing.count}
                 onClick={() => onAbilityUse("healing")} // Use Healing Power
+                disabled={powers.healing.count <= 0} // Disable if no power left
               />
             </div>
           )}

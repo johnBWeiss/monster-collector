@@ -86,8 +86,9 @@ export class CreatureController extends EventEmitter<CreatureEvents> {
     const damage = Math.max(power.attackValue - target.attributes.defense, 0);
 
     // Decrease the power count
-    power.count--;
-
+    if (powerType !== "secondary") {
+      power.count--;
+    }
     this.emit("powerUsed", { powerType, remaining: power.count });
     this.emit("attack", { target: target.attributes.name, damage, powerType });
 
