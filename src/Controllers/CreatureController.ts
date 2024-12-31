@@ -1,32 +1,43 @@
 import { EventEmitter } from "../coreClasses/EventEmitter";
 
-type CreatureAttributes = {
+type Power = {
+  count: number;
+  attackValue: number;
+};
+
+export type CreatureAttributes = {
   name: string;
   currentHealth: number;
-  attack: number;
-  defense: number;
   maxHealth: number;
+  defense: number;
+  powers: {
+    primary: Power;
+    secondary: Power;
+    healing: Power;
+  };
 };
 
 type CreatureEvents = {
   attributeChange: Partial<CreatureAttributes>;
   healthChange: { health: number };
   death: { name: string };
-  attack: { target: string; damage: number };
+  attack: {
+    target: string;
+    damage: number;
+    powerType: keyof CreatureAttributes["powers"];
+  };
+  powerUsed: {
+    powerType: keyof CreatureAttributes["powers"];
+    remaining: number;
+  };
 };
 
 export class CreatureController extends EventEmitter<CreatureEvents> {
   private attributes: CreatureAttributes;
 
-  constructor(
-    name: string,
-    currentHealth: number,
-    maxHealth: number,
-    attack: number,
-    defense: number,
-  ) {
+  constructor(options: CreatureAttributes) {
     super();
-    this.attributes = { name, currentHealth, attack, defense, maxHealth };
+    this.attributes = options;
   }
 
   get isAlive(): boolean {
@@ -55,32 +66,33 @@ export class CreatureController extends EventEmitter<CreatureEvents> {
       throw new Error("Damage must be a positive number.");
     }
     const newHealth = Math.max(this.attributes.currentHealth - damage, 0);
-    this.updateAttributes({ currentHealth: newHealth });
+    this.updateAttributes({ ...this.attributes, currentHealth: newHealth });
   }
 
-  attackCreature(target: CreatureController): void {
+  usePower(
+    powerType: keyof CreatureAttributes["powers"],
+    target: CreatureController,
+  ): void {
+    const power = this.attributes.powers[powerType];
+    if (!power || power.count <= 0) {
+      throw new Error(`${powerType} power has been exhausted.`);
+    }
+
     if (!target.isAlive) {
       console.warn(`${target.attributes.name} is already dead.`);
       return;
     }
 
-    const damage = Math.max(
-      this.attributes.attack - target.attributes.defense,
-      0,
-    );
-    this.emit("attack", { target: target.attributes.name, damage });
+    const damage = Math.max(power.attackValue - target.attributes.defense, 0);
+
+    // Decrease the power count
+    power.count--;
+
+    this.emit("powerUsed", { powerType, remaining: power.count });
+    this.emit("attack", { target: target.attributes.name, damage, powerType });
+
+    // Apply damage to the target
     target.takeDamage(damage);
-  }
-
-  resetHealth(): void {
-    this.updateAttributes({ currentHealth: this.attributes.maxHealth });
-  }
-
-  updateStat(stat: keyof CreatureAttributes, value: number): void {
-    if (stat === "currentHealth") {
-      throw new Error("Use heal or takeDamage to modify health.");
-    }
-    this.updateAttributes({ [stat]: value });
   }
 
   getState(): Readonly<CreatureAttributes> {

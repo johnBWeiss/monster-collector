@@ -1,6 +1,6 @@
 import { PageSection } from "../../coreComponents/pageSection/PageSection";
 import React, { FC, useEffect, useRef, useState } from "react";
-import background from "../../assets/images/robots/backgrounds/robotBackground1.png";
+import background from "../../assets/images/robots/backgrounds/robotBackground4.png";
 import yogi1Back from "../../assets/images/robots/characters/hero1Back.png";
 import baddy1 from "../../assets/images/robots/characters/hero2.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
@@ -16,15 +16,41 @@ import { popUpController } from "../../Controllers/PopUpController";
 
 export const Home: FC = () => {
   const audioRef = useRef(new Audio(fireballSound));
-  const user = useRef(new CreatureController("User", 100, 100, 15, 5));
-  const enemy = useRef(new CreatureController("Enemy", 80, 80, 10, 3));
+  const user = useRef(
+    new CreatureController({
+      name: "User",
+      currentHealth: 100,
+      maxHealth: 100,
+      defense: 5,
+      powers: {
+        primary: { count: 3, attackValue: 20 },
+        secondary: { count: 2, attackValue: 10 },
+        healing: { count: 1, attackValue: 0 }, // Healing might not deal damage
+      },
+    }),
+  );
+
+  const enemy = useRef(
+    new CreatureController({
+      name: "Enemy",
+      currentHealth: 80,
+      maxHealth: 80,
+      defense: 3,
+      powers: {
+        primary: { count: 2, attackValue: 15 },
+        secondary: { count: 1, attackValue: 8 },
+        healing: { count: 1, attackValue: 0 },
+      },
+    }),
+  );
+
   const gameController = useRef(
     new GameController(user.current, enemy.current),
   );
 
   const userAttributes = useCreatureAttributes(user.current);
   const enemyAttributes = useCreatureAttributes(enemy.current);
-
+  console.log(userAttributes);
   const [shouldShowHeroProjectile, setShouldShowHeroProjectile] =
     useState(false);
   const [shouldShowEnemyProjectile, setShouldShowEnemyProjectile] =
@@ -41,30 +67,34 @@ export const Home: FC = () => {
     target: CreatureController,
     setProjectile: React.Dispatch<React.SetStateAction<boolean>>,
     setTargetShaking: React.Dispatch<React.SetStateAction<boolean>>,
+    powerType: "primary" | "secondary" | "healing", // Add this argument
   ) => {
     if (isTurnLocked) return;
     setIsTurnLocked(true);
 
     console.log(
-      `${attacker.getState().name} attacks ${target.getState().name}`,
+      `${attacker.getState().name} uses ${powerType} to attack ${target.getState().name}`,
     );
 
-    // Play attack sound
-    audioRef.current.currentTime = 0;
-    audioRef.current.play();
+    try {
+      // Play attack sound
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
 
-    // Show projectile
-    setProjectile(true);
-    await delay(700); // Simulate projectile travel
-    setProjectile(false);
+      // Show projectile
+      setProjectile(true);
+      await delay(700); // Simulate projectile travel
+      setProjectile(false);
 
-    // Perform the attack
-    attacker.attackCreature(target);
-
-    // Target shaking animation
-    setTargetShaking(true);
-    await delay(500); // Simulate shaking
-    setTargetShaking(false);
+      // Target shaking animation
+      setTargetShaking(true);
+      // Use the specified power
+      attacker.usePower(powerType, target);
+      await delay(500); // Simulate shaking
+      setTargetShaking(false);
+    } catch (error) {
+      console.error("error.message"); // Handle errors (e.g., power exhausted)
+    }
 
     setIsTurnLocked(false);
 
@@ -72,13 +102,14 @@ export const Home: FC = () => {
     gameController.current.switchTurn();
   };
 
-  const handleHeroShoot = () => {
+  const handleHeroShoot = (powerType: "primary" | "secondary" | "healing") => {
     if (gameController.current.getTurn() === "user" && !isTurnLocked) {
       handleAttack(
         user.current,
         enemy.current,
         setShouldShowHeroProjectile,
         setIsEnemyShaking,
+        powerType, // Specify the power type here
       );
     }
   };
@@ -101,6 +132,7 @@ export const Home: FC = () => {
           user.current,
           setShouldShowEnemyProjectile,
           setIsUserShaking,
+          "primary",
         );
       }
     };
@@ -153,20 +185,19 @@ export const Home: FC = () => {
           className={classNameParserCore("m-right-auto", {
             "hit-recoil-left": isEnemyShaking,
           })}
-          currentHealth={enemyAttributes.currentHealth}
-          maxHealth={enemyAttributes.maxHealth}
+          creatureAttributes={enemyAttributes}
         />
         {/* User Section */}
         <Creature
           imgSrc={yogi1Back}
-          onClick={handleHeroShoot}
+          onClick={() => console.log("Hero clicked")} // Optional action
+          onAbilityUse={(powerType) => handleHeroShoot(powerType)} // Pass attack callback
           projectileSrc={fireball}
           shouldShowProjectile={shouldShowHeroProjectile}
           className={classNameParserCore("m-left-auto", {
             "hit-recoil-right": isUserShaking,
           })}
-          currentHealth={userAttributes.currentHealth}
-          maxHealth={userAttributes.maxHealth}
+          creatureAttributes={userAttributes}
         />
       </div>
     </PageSection>

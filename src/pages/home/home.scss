@@ -21,13 +21,11 @@ img {
 }
 
 .creatures-container {
-  height: 250px;
   width: 370px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  align-self: end;
-  margin-bottom: 125px;
+  gap: 40px;
 }
 
 /* Animations for Shaking and Recoil */

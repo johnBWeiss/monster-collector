@@ -24,10 +24,9 @@ export const CreatureStats: React.FC<CreatureStatsProps> = ({
 
   return (
     <div className={`creature-stats ${isEnemy ? "is-enemy" : ""}`}>
-      <p className="stats-name">{name}</p>
-      <div className="flex space-around">
-        <p className="stats-level">Level: {level}</p>
-        <p className="stats-xp">XP: {xp}</p>
+      <div className="flex space-between">
+        <p className="stats-xp">Syther</p>{" "}
+        <p className="stats-level">Lvl {level}</p>
       </div>
 
       <ProgressBarCore
