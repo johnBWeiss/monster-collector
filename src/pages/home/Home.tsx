@@ -1,8 +1,8 @@
 import { PageSection } from "../../coreComponents/pageSection/PageSection";
 import React, { FC, useEffect, useRef, useState } from "react";
-import background from "../../assets/images/game/background.png";
-import yogi1Back from "../../assets/images/monsters/yogi1-back.png";
-import baddy1 from "../../assets/images/monsters/baddy-1.png";
+import background from "../../assets/images/robots/backgrounds/robotBackground.webp";
+import yogi1Back from "../../assets/images/robots/characters/hero1Back.png";
+import baddy1 from "../../assets/images/robots/characters/hero2.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
 import "./home.scss";
 import { CreatureController } from "../../Controllers/CreatureController";
@@ -95,7 +95,7 @@ export const Home: FC = () => {
         enemy.current.isAlive &&
         user.current.isAlive
       ) {
-        await delay(300); // Add a delay before the enemy attacks
+        await delay(600); // Add a delay before the enemy attacks
         handleAttack(
           enemy.current,
           user.current,

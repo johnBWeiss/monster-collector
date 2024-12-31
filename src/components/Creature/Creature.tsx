@@ -32,6 +32,9 @@ export const Creature: React.FC<CreatureProps> = ({
       className={classNameParserCore(
         "creature-container relative fit-content",
         className,
+        {
+          "flex-row-reverse": isEnemy,
+        },
       )}
       onClick={onClick}
     >

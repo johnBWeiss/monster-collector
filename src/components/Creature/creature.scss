@@ -1,18 +1,17 @@
 .creature-container {
   justify-content: center;
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 8px;
 }
 
 .creature-img {
-  width: 90px;
+  width: 170px;
   z-index: 2;
   position: relative;
 
   &.is-enemy {
-    width: 190px;
+    width: 130px;
 
     z-index: 0;
   }
