@@ -30,9 +30,7 @@ export const AbilityCard: FC<AbilityCardProps> = ({
         className="ability-card__image"
         style={{ opacity: disabled ? 0.5 : 1 }} // Visually indicate disabled state
       />
-      <div className="ability-card__attacks-left">
-        {attacksLeft ? attacksLeft : "∞"}
-      </div>
+      <div className="ability-card__attacks-left">{attacksLeft ?? "∞"}</div>
     </div>
   );
 };
