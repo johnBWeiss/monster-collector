@@ -1,6 +1,6 @@
 import { PageSection } from "../../coreComponents/pageSection/PageSection";
 import React, { FC, useEffect, useRef, useState } from "react";
-import background from "../../assets/images/robots/backgrounds/robotBackground.webp";
+import background from "../../assets/images/robots/backgrounds/robotBackground1.png";
 import yogi1Back from "../../assets/images/robots/characters/hero1Back.png";
 import baddy1 from "../../assets/images/robots/characters/hero2.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
