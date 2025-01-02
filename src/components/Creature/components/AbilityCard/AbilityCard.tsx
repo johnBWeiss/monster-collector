@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import "./ability-card.scss";
+import { classNameParserCore } from "../../../../coreFunctions/classNameParserCore/classNameParserCore";
 
 interface AbilityCardProps {
   imgSrc: string; // Source of the image
@@ -18,7 +19,9 @@ export const AbilityCard: FC<AbilityCardProps> = ({
 }) => {
   return (
     <div
-      className={`ability-card ${disabled ? "disabled" : ""}`}
+      className={classNameParserCore("ability-card", {
+        disabled: disabled,
+      })}
       onClick={!disabled ? onClick : undefined} // Prevent clicks if disabled
       role="button"
       aria-disabled={disabled} // Accessibility
