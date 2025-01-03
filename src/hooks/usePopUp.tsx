@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { popUpController } from "../Controllers/PopUpController";
+import { popUpController } from "../controllers/PopUpController";
 
 type PopUpOptions = {
   content: React.ReactNode;

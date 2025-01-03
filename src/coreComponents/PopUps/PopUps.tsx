@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./pop-ups.scss";
-import { popUpController } from "../../Controllers/PopUpController";
+import { popUpController } from "../../controllers/PopUpController";
 
 type PopUp = {
   id: string;

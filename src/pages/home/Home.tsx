@@ -5,28 +5,34 @@ import yogi1Back from "../../assets/images/robots/characters/hero1Back.png";
 import baddy1 from "../../assets/images/robots/characters/hero2.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
 import "./home.scss";
-import { CreatureController } from "../../Controllers/CreatureController";
-import { GameController } from "../../Controllers/GameController";
+import { CreatureController } from "../../controllers/CreatureController";
+import { GameController } from "../../controllers/GameController";
 import { Creature } from "../../components/Creature/Creature";
-import fireball from "../../assets/images/abilities/fireball.png";
-import iceShards from "../../assets/images/abilities/iceShards.png";
 import { useCreatureAttributes } from "../../hooks/useCreatureAttributes";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
-import { popUpController } from "../../Controllers/PopUpController";
+import { popUpController } from "../../controllers/PopUpController";
+import { abilitiesDirectory } from "../../data/abilitiesDirectory/abilitiesDirectory";
+import { getEnemyAbility } from "./utilities/enemySimulationFunctions";
 
 export const Home: FC = () => {
   const audioRef = useRef(new Audio(fireballSound));
+  const mapAbilities = (abilityNames: string[]) => {
+    return abilityNames.map((name) => {
+      const ability = abilitiesDirectory[name];
+      if (!ability) {
+        throw new Error(`Ability "${name}" not found in the directory.`);
+      }
+      return ability;
+    });
+  };
+
   const user = useRef(
     new CreatureController({
       name: "User",
       currentHealth: 100,
       maxHealth: 100,
       defense: 5,
-      powers: {
-        primary: { count: 3, attackValue: 20 },
-        secondary: { count: 2, attackValue: 10 },
-        healing: { count: 1, attackValue: 0 }, // Healing might not deal damage
-      },
+      abilities: mapAbilities(["fireball", "darkSlash"]), // Array of ability names
     }),
   );
 
@@ -36,11 +42,7 @@ export const Home: FC = () => {
       currentHealth: 80,
       maxHealth: 80,
       defense: 3,
-      powers: {
-        primary: { count: 2, attackValue: 15 },
-        secondary: { count: 1, attackValue: 8 },
-        healing: { count: 1, attackValue: 0 },
-      },
+      abilities: mapAbilities(["poisonFog"]), // Array of ability names
     }),
   );
 
@@ -50,9 +52,10 @@ export const Home: FC = () => {
 
   const userAttributes = useCreatureAttributes(user.current);
   const enemyAttributes = useCreatureAttributes(enemy.current);
-  console.log(userAttributes);
-  const [shouldShowHeroProjectile, setShouldShowHeroProjectile] =
-    useState(false);
+
+  const [userAbilityImg, setUserAbilityImg] = useState<string>("");
+  const [enemyAbilityImg, setEnemyAbilityImg] = useState<string>("");
+
   const [shouldShowEnemyProjectile, setShouldShowEnemyProjectile] =
     useState(false);
   const [isUserShaking, setIsUserShaking] = useState(false);
@@ -65,16 +68,13 @@ export const Home: FC = () => {
   const handleAttack = async (
     attacker: CreatureController,
     target: CreatureController,
-    setProjectile: React.Dispatch<React.SetStateAction<boolean>>,
+    setUserAbilityImg: React.Dispatch<React.SetStateAction<string>>,
     setTargetShaking: React.Dispatch<React.SetStateAction<boolean>>,
-    powerType: "primary" | "secondary" | "healing", // Add this argument
+    abilityId: string,
+    abilityImg: string,
   ) => {
     if (isTurnLocked) return;
     setIsTurnLocked(true);
-
-    console.log(
-      `${attacker.getState().name} uses ${powerType} to attack ${target.getState().name}`,
-    );
 
     try {
       // Play attack sound
@@ -82,14 +82,14 @@ export const Home: FC = () => {
       audioRef.current.play();
 
       // Show projectile
-      setProjectile(true);
+      setUserAbilityImg(abilityImg);
       await delay(700); // Simulate projectile travel
-      setProjectile(false);
+      setUserAbilityImg("");
 
       // Target shaking animation
       setTargetShaking(true);
       // Use the specified power
-      attacker.usePower(powerType, target);
+      attacker.useAbility(abilityId, target);
       await delay(500); // Simulate shaking
       setTargetShaking(false);
     } catch (error) {
@@ -102,14 +102,15 @@ export const Home: FC = () => {
     gameController.current.switchTurn();
   };
 
-  const handleHeroShoot = (powerType: "primary" | "secondary" | "healing") => {
+  const handleHeroShoot = (abilityId: string, abilityImg: string) => {
     if (gameController.current.getTurn() === "user" && !isTurnLocked) {
       handleAttack(
         user.current,
         enemy.current,
-        setShouldShowHeroProjectile,
+        setUserAbilityImg,
         setIsEnemyShaking,
-        powerType, // Specify the power type here
+        abilityId,
+        abilityImg,
       );
     }
   };
@@ -127,12 +128,14 @@ export const Home: FC = () => {
         user.current.isAlive
       ) {
         await delay(600); // Add a delay before the enemy attacks
+        const { abilityId, abilityImg } = await getEnemyAbility(enemy.current);
         handleAttack(
           enemy.current,
           user.current,
-          setShouldShowEnemyProjectile,
+          setEnemyAbilityImg,
           setIsUserShaking,
-          "primary",
+          abilityId,
+          abilityImg,
         );
       }
     };
@@ -179,8 +182,8 @@ export const Home: FC = () => {
         <Creature
           imgSrc={baddy1}
           onClick={() => console.warn("Enemy can't be clicked!")}
-          projectileSrc={iceShards}
-          shouldShowProjectile={shouldShowEnemyProjectile}
+          projectileSrc={enemyAbilityImg}
+          shouldShowProjectile={!!enemyAbilityImg}
           isEnemy
           className={classNameParserCore("m-right-auto", {
             "hit-recoil-left": isEnemyShaking,
@@ -191,9 +194,11 @@ export const Home: FC = () => {
         <Creature
           imgSrc={yogi1Back}
           onClick={() => console.log("Hero clicked")} // Optional action
-          onAbilityUse={(powerType) => handleHeroShoot(powerType)} // Pass attack callback
-          projectileSrc={fireball}
-          shouldShowProjectile={shouldShowHeroProjectile}
+          onAbilityUse={(abilityId, abilityImg) =>
+            handleHeroShoot(abilityId, abilityImg)
+          }
+          projectileSrc={userAbilityImg}
+          shouldShowProjectile={!!userAbilityImg}
           className={classNameParserCore("m-left-auto", {
             "hit-recoil-right": isUserShaking,
           })}

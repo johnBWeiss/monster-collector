@@ -1,39 +1,60 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import "./ability-card.scss";
 import { classNameParserCore } from "../../../../coreFunctions/classNameParserCore/classNameParserCore";
+import { Ability } from "../../../../data/abilitiesDirectory/abilitiesDirectory";
 
 interface AbilityCardProps {
-  imgSrc: string;
-  altText?: string;
-  onClick?: () => void;
-  attacksLeft?: number | "infinite";
-  disabled?: boolean;
+  ability: Ability;
+  onClick?: (abilityId: string, imgSrc: string) => void;
 }
 
-export const AbilityCard: FC<AbilityCardProps> = ({
-  imgSrc,
-  altText = "Ability Card",
-  onClick,
-  attacksLeft,
-  disabled = false,
-}) => {
+export const AbilityCard: FC<AbilityCardProps> = ({ onClick, ability }) => {
+  const isDisabled = ability.baseStats.ammo <= 0;
+  const [imageSource, setImageSource] = useState<string>("");
+
+  useEffect(() => {
+    const loadImage = async () => {
+      if (typeof ability.image === "function") {
+        try {
+          const module = await ability.image();
+          if (typeof module === "string") {
+            setImageSource(module);
+          } else if (module.default) {
+            setImageSource(module.default); // Handle default export
+          } else {
+            throw new Error("Invalid image module format.");
+          }
+        } catch (error) {
+          console.error("Failed to load ability image:", error);
+        }
+      } else {
+        setImageSource(ability.image);
+      }
+    };
+
+    loadImage();
+  }, [ability.image]);
   return (
     <div
       className={classNameParserCore("ability-card", {
-        disabled,
+        disabled: isDisabled,
       })}
-      onClick={!disabled ? onClick : undefined} // Prevent clicks if disabled
+      onClick={
+        !isDisabled ? () => onClick?.(ability.id, imageSource) : undefined
+      } // Prevent clicks if disabled
       role="button"
-      aria-disabled={disabled}
-      tabIndex={disabled ? -1 : 0}
+      aria-disabled={isDisabled}
+      tabIndex={isDisabled ? -1 : 0}
     >
       <img
-        src={imgSrc}
-        alt={altText}
+        src={imageSource}
+        alt={ability.name}
         className="ability-card__image"
-        style={{ opacity: disabled ? 0.5 : 1 }} // Visually indicate disabled state
+        style={{ opacity: isDisabled ? 0.5 : 1 }} // Visually indicate disabled state
       />
-      <div className="ability-card__attacks-left">{attacksLeft ?? "∞"}</div>
+      <div className="ability-card__attacks-left">
+        {ability.baseStats.ammo ?? "∞"}
+      </div>
     </div>
   );
 };

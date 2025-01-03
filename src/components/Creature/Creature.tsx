@@ -3,8 +3,7 @@ import { classNameParserCore } from "../../coreFunctions/classNameParserCore/cla
 import "./creature.scss";
 import { CreatureStats } from "./components/CreatureStats/CreatureStats";
 import { AbilityCard } from "./components/AbilityCard/AbilityCard";
-import fireballIcon from "../../assets/images/robots/icons/abilityIcon/fireBallIcon.png";
-import { CreatureAttributes } from "../../Controllers/CreatureController";
+import { CreatureAttributes } from "../../controllers/CreatureController";
 
 export type CreatureProps = {
   imgSrc: string;
@@ -16,7 +15,7 @@ export type CreatureProps = {
   projectileClassName?: string;
   isEnemy?: boolean;
   creatureAttributes: CreatureAttributes;
-  onAbilityUse?: (powerType: "primary" | "secondary" | "healing") => void; // Callback for ability usage
+  onAbilityUse?: (abilityId: string, imgSrc: string) => void; // Callback for ability usage
 };
 
 export const Creature: React.FC<CreatureProps> = ({
@@ -30,8 +29,7 @@ export const Creature: React.FC<CreatureProps> = ({
   creatureAttributes,
   onAbilityUse,
 }) => {
-  const { currentHealth, maxHealth, powers } = creatureAttributes;
-
+  const { currentHealth, maxHealth, abilities } = creatureAttributes || {};
   return (
     <div
       className={classNameParserCore(
@@ -56,24 +54,15 @@ export const Creature: React.FC<CreatureProps> = ({
 
           {/* Ability Cards for User Only */}
           {!isEnemy && onAbilityUse && (
-            <div className={"flex flex-1 space-between"}>
-              <AbilityCard
-                imgSrc={fireballIcon}
-                attacksLeft={powers.primary.count}
-                onClick={() => onAbilityUse("primary")} // Use Primary Power
-                disabled={powers.primary.count <= 0} // Disable if no power left
-              />
-              <AbilityCard
-                imgSrc={fireballIcon}
-                onClick={() => onAbilityUse("secondary")} // Use Secondary Power
-                disabled={false} // Never disable secondary power
-              />
-              <AbilityCard
-                imgSrc={fireballIcon}
-                attacksLeft={powers.healing.count}
-                onClick={() => onAbilityUse("healing")} // Use Healing Power
-                disabled={powers.healing.count <= 0} // Disable if no power left
-              />
+            <div className={"flex flex-1 gap-6 flex-wrap"}>
+              {abilities?.map((ability) => (
+                <AbilityCard
+                  ability={ability}
+                  onClick={(abilityId, imgSrc) =>
+                    onAbilityUse(abilityId, imgSrc)
+                  }
+                />
+              ))}
             </div>
           )}
         </div>
