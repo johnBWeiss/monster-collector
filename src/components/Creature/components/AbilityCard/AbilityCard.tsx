@@ -5,11 +5,13 @@ import { Ability } from "../../../../data/abilitiesDirectory/abilitiesDirectory"
 
 interface AbilityCardProps {
   ability: Ability;
-  onClick?: (abilityId: string, imgSrc: string) => void;
+  onClick?: (ability: Ability) => void;
 }
 
 export const AbilityCard: FC<AbilityCardProps> = ({ onClick, ability }) => {
-  const isDisabled = ability.baseStats.ammo <= 0;
+  const isDisabled = Boolean(
+    typeof ability.baseStats.ammo === "number" && ability.baseStats.ammo <= 0,
+  );
   const [imageSource, setImageSource] = useState<string>("");
 
   useEffect(() => {
@@ -34,14 +36,13 @@ export const AbilityCard: FC<AbilityCardProps> = ({ onClick, ability }) => {
 
     loadImage();
   }, [ability.image]);
+
   return (
     <div
       className={classNameParserCore("ability-card", {
         disabled: isDisabled,
       })}
-      onClick={
-        !isDisabled ? () => onClick?.(ability.id, imageSource) : undefined
-      } // Prevent clicks if disabled
+      onClick={!isDisabled ? () => onClick?.(ability) : undefined}
       role="button"
       aria-disabled={isDisabled}
       tabIndex={isDisabled ? -1 : 0}
@@ -50,7 +51,7 @@ export const AbilityCard: FC<AbilityCardProps> = ({ onClick, ability }) => {
         src={imageSource}
         alt={ability.name}
         className="ability-card__image"
-        style={{ opacity: isDisabled ? 0.5 : 1 }} // Visually indicate disabled state
+        style={{ opacity: isDisabled ? 0.5 : 1 }}
       />
       <div className="ability-card__attacks-left">
         {ability.baseStats.ammo ?? "∞"}

@@ -4,18 +4,20 @@ import "./creature.scss";
 import { CreatureStats } from "./components/CreatureStats/CreatureStats";
 import { AbilityCard } from "./components/AbilityCard/AbilityCard";
 import { CreatureAttributes } from "../../controllers/CreatureController";
+import { Ability } from "../../data/abilitiesDirectory/abilitiesDirectory";
 
 export type CreatureProps = {
   imgSrc: string;
   projectileSrc: string;
   onClick: (event: React.MouseEvent) => void;
   shouldShowProjectile: boolean;
+  projectileAnimation: string;
   className?: string;
   imgClassName?: string;
   projectileClassName?: string;
   isEnemy?: boolean;
   creatureAttributes: CreatureAttributes;
-  onAbilityUse?: (abilityId: string, imgSrc: string) => void; // Callback for ability usage
+  onAbilityUse?: (ability: Ability) => void; // Callback for ability usage
 };
 
 export const Creature: React.FC<CreatureProps> = ({
@@ -28,6 +30,7 @@ export const Creature: React.FC<CreatureProps> = ({
   isEnemy,
   creatureAttributes,
   onAbilityUse,
+  projectileAnimation,
 }) => {
   const { currentHealth, maxHealth, abilities } = creatureAttributes || {};
   return (
@@ -57,10 +60,9 @@ export const Creature: React.FC<CreatureProps> = ({
             <div className={"flex flex-1 gap-6 flex-wrap"}>
               {abilities?.map((ability) => (
                 <AbilityCard
+                  key={ability.id}
                   ability={ability}
-                  onClick={(abilityId, imgSrc) =>
-                    onAbilityUse(abilityId, imgSrc)
-                  }
+                  onClick={(ability) => onAbilityUse(ability)}
                 />
               ))}
             </div>
@@ -84,6 +86,9 @@ export const Creature: React.FC<CreatureProps> = ({
           })}
           src={projectileSrc}
           alt={"creature-projectile"}
+          style={{
+            animation: `${isEnemy ? "isEnemy-" : ""}${projectileAnimation} 1s infinite linear`,
+          }}
         />
       )}
     </div>

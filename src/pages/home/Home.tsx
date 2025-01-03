@@ -11,7 +11,10 @@ import { Creature } from "../../components/Creature/Creature";
 import { useCreatureAttributes } from "../../hooks/useCreatureAttributes";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 import { popUpController } from "../../controllers/PopUpController";
-import { abilitiesDirectory } from "../../data/abilitiesDirectory/abilitiesDirectory";
+import {
+  abilitiesDirectory,
+  Ability,
+} from "../../data/abilitiesDirectory/abilitiesDirectory";
 import { getEnemyAbility } from "./utilities/enemySimulationFunctions";
 
 export const Home: FC = () => {
@@ -32,7 +35,7 @@ export const Home: FC = () => {
       currentHealth: 100,
       maxHealth: 100,
       defense: 5,
-      abilities: mapAbilities(["fireball", "darkSlash"]), // Array of ability names
+      abilities: mapAbilities(["fireball", "simpleEnergyBeam"]), // Array of ability names
     }),
   );
 
@@ -42,7 +45,7 @@ export const Home: FC = () => {
       currentHealth: 80,
       maxHealth: 80,
       defense: 3,
-      abilities: mapAbilities(["poisonFog"]), // Array of ability names
+      abilities: mapAbilities(["simpleEnergyBeam"]), // Array of ability names
     }),
   );
 
@@ -56,6 +59,9 @@ export const Home: FC = () => {
   const [userAbilityImg, setUserAbilityImg] = useState<string>("");
   const [enemyAbilityImg, setEnemyAbilityImg] = useState<string>("");
 
+  const [userProjectileAnimation, setUserProjectileAnimation] = useState("");
+  const [enemyProjectileAnimation, setEnemyProjectileAnimation] = useState("");
+
   const [shouldShowEnemyProjectile, setShouldShowEnemyProjectile] =
     useState(false);
   const [isUserShaking, setIsUserShaking] = useState(false);
@@ -68,32 +74,58 @@ export const Home: FC = () => {
   const handleAttack = async (
     attacker: CreatureController,
     target: CreatureController,
-    setUserAbilityImg: React.Dispatch<React.SetStateAction<string>>,
+    setProjectileImg: React.Dispatch<React.SetStateAction<string>>,
     setTargetShaking: React.Dispatch<React.SetStateAction<boolean>>,
-    abilityId: string,
-    abilityImg: string,
+    ability: Ability,
   ) => {
     if (isTurnLocked) return;
     setIsTurnLocked(true);
 
+    const loadImage = async () => {
+      if (typeof ability.image === "function") {
+        try {
+          const module = await ability.image();
+          if (typeof module === "string") {
+            return module;
+          } else if (module.default) {
+            return module.default; // Handle default export
+          } else {
+            throw new Error("Invalid image module format.");
+          }
+        } catch (error) {
+          console.error("Failed to load ability image:", error);
+          return ""; // Fallback to empty string on failure
+        }
+      } else {
+        return ability.image;
+      }
+    };
+
     try {
-      // Play attack sound
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
+      // Load image
+      const imageSrc = await loadImage();
+
+      // Load and play audio
+      if (ability.audio) {
+        const audioModule = await ability.audio();
+        const audio = new Audio(audioModule.default);
+        audio.currentTime = 0;
+        await audio.play(); // Play the ability sound
+      }
 
       // Show projectile
-      setUserAbilityImg(abilityImg);
+      setProjectileImg(imageSrc);
+
       await delay(700); // Simulate projectile travel
-      setUserAbilityImg("");
+      setProjectileImg("");
 
       // Target shaking animation
       setTargetShaking(true);
-      // Use the specified power
-      attacker.useAbility(abilityId, target);
+      attacker.useAbility(ability.id, target);
       await delay(500); // Simulate shaking
       setTargetShaking(false);
     } catch (error) {
-      console.error("error.message"); // Handle errors (e.g., power exhausted)
+      console.error("Error during attack:", error);
     }
 
     setIsTurnLocked(false);
@@ -102,15 +134,15 @@ export const Home: FC = () => {
     gameController.current.switchTurn();
   };
 
-  const handleHeroShoot = (abilityId: string, abilityImg: string) => {
+  const handleHeroShoot = (ability: Ability) => {
     if (gameController.current.getTurn() === "user" && !isTurnLocked) {
+      setUserProjectileAnimation(ability.id);
       handleAttack(
         user.current,
         enemy.current,
         setUserAbilityImg,
         setIsEnemyShaking,
-        abilityId,
-        abilityImg,
+        ability,
       );
     }
   };
@@ -128,14 +160,15 @@ export const Home: FC = () => {
         user.current.isAlive
       ) {
         await delay(600); // Add a delay before the enemy attacks
-        const { abilityId, abilityImg } = await getEnemyAbility(enemy.current);
+        const ability = await getEnemyAbility(enemy.current);
+        setEnemyProjectileAnimation(ability.id);
+
         handleAttack(
           enemy.current,
           user.current,
           setEnemyAbilityImg,
           setIsUserShaking,
-          abilityId,
-          abilityImg,
+          ability,
         );
       }
     };
@@ -189,20 +222,20 @@ export const Home: FC = () => {
             "hit-recoil-left": isEnemyShaking,
           })}
           creatureAttributes={enemyAttributes}
+          projectileAnimation={enemyProjectileAnimation}
         />
         {/* User Section */}
         <Creature
           imgSrc={yogi1Back}
           onClick={() => console.log("Hero clicked")} // Optional action
-          onAbilityUse={(abilityId, abilityImg) =>
-            handleHeroShoot(abilityId, abilityImg)
-          }
+          onAbilityUse={(ability: Ability) => handleHeroShoot(ability)}
           projectileSrc={userAbilityImg}
           shouldShowProjectile={!!userAbilityImg}
           className={classNameParserCore("m-left-auto", {
             "hit-recoil-right": isUserShaking,
           })}
           creatureAttributes={userAttributes}
+          projectileAnimation={userProjectileAnimation}
         />
       </div>
     </PageSection>

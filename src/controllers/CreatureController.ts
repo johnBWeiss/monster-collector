@@ -97,8 +97,7 @@ export class CreatureController extends EventEmitter<CreatureEvents> {
       this.updateAttributes({ currentHealth: newHealth });
     }
 
-    // Decrement ammo and update the ability in the attributes
-    if (ammo !== null) {
+    if (ammo && ammo > 0) {
       const updatedAbility = {
         ...ability,
         baseStats: { ...baseStats, ammo: ammo - 1 },

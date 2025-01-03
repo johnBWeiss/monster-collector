@@ -26,7 +26,7 @@
   width: 40px;
   border-radius: 50%;
   position: absolute;
-  right: 20px;
+  right: 80px;
   bottom: 60px;
   animation: heroAttack 1s infinite linear;
   display: none;
@@ -37,8 +37,8 @@
 
   &.is-enemy {
     animation: enemyAttack 1s infinite linear;
-    bottom: 220px;
-    right: 130px
+    bottom: 50px;
+    right: 170px
 
   }
 
@@ -52,7 +52,7 @@
   animation: hitRecoilRight 0.5s ease-in-out;
 }
 
-@keyframes heroAttack {
+@keyframes fireball {
   0% {
     transform: scale(0.2) translate(0, 0);
     opacity: 1;
@@ -62,13 +62,33 @@
   }
 }
 
-@keyframes enemyAttack {
+@keyframes simpleEnergyBeam {
   0% {
     transform: scale(0.2) translate(0, 0);
     opacity: 1;
   }
   100% {
-    transform: translate(280px, 180px) scale(3.5);
+    transform: translate(-180px, -180px) scale(1);
+  }
+}
+
+@keyframes isEnemy-simpleEnergyBeam {
+  0% {
+    transform: scale(0.2) translate(0px, 0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(180px, 180px) scale(1);
+  }
+}
+
+@keyframes isEnemy-fireball {
+  0% {
+    transform: scale(0.2) translate(0px, 0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(180px, 180px) scale(3.5);
   }
 }
 

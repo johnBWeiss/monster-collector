@@ -1,10 +1,11 @@
 import { CreatureController } from "../../../controllers/CreatureController";
+import { Ability } from "../../../data/abilitiesDirectory/abilitiesDirectory";
 
 class Creature {}
 
 export const getEnemyAbility = async (
   enemy: CreatureController,
-): Promise<{ abilityId: string; abilityImg: string }> => {
+): Promise<Ability> => {
   const enemyAbilities = enemy.getState().abilities;
 
   // Filter abilities that are usable (e.g., ammo > 0, not on cooldown)
@@ -30,5 +31,5 @@ export const getEnemyAbility = async (
     abilityImg = randomAbility.image;
   }
 
-  return { abilityId: randomAbility.id, abilityImg };
+  return randomAbility;
 };
