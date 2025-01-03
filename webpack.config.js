@@ -65,6 +65,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: "public/_redirects", to: "_redirects" }, // Copy _redirects to dist
+        { from: "public/netlify.toml", to: "netlify.toml" },
       ],
     }),
   ],
