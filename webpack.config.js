@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin"); // Import the plugin
+const CopyWebpackPlugin = require("copy-webpack-plugin"); // Import the plugin
 
 module.exports = {
   entry: "./src/index.tsx",
@@ -60,6 +61,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "public", "index.html"), // Path to your HTML template
       filename: "index.html", // Output HTML file
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "public/_redirects", to: "_redirects" }, // Copy _redirects to dist
+      ],
     }),
   ],
 };
