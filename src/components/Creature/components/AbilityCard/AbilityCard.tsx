@@ -3,11 +3,11 @@ import "./ability-card.scss";
 import { classNameParserCore } from "../../../../coreFunctions/classNameParserCore/classNameParserCore";
 
 interface AbilityCardProps {
-  imgSrc: string; // Source of the image
-  altText?: string; // Alt text for the image
-  onClick?: () => void; // Optional onClick handler
-  attacksLeft?: number | "infinite"; // Number of attacks left or "infinite"
-  disabled?: boolean; // Disables the card if true
+  imgSrc: string;
+  altText?: string;
+  onClick?: () => void;
+  attacksLeft?: number | "infinite";
+  disabled?: boolean;
 }
 
 export const AbilityCard: FC<AbilityCardProps> = ({
@@ -20,12 +20,12 @@ export const AbilityCard: FC<AbilityCardProps> = ({
   return (
     <div
       className={classNameParserCore("ability-card", {
-        disabled: disabled,
+        disabled,
       })}
       onClick={!disabled ? onClick : undefined} // Prevent clicks if disabled
       role="button"
-      aria-disabled={disabled} // Accessibility
-      tabIndex={disabled ? -1 : 0} // Prevent focus if disabled
+      aria-disabled={disabled}
+      tabIndex={disabled ? -1 : 0}
     >
       <img
         src={imgSrc}
