@@ -1,12 +1,15 @@
 import { EventEmitter } from "../coreClasses/EventEmitter";
 import { Ability } from "../data/abilitiesDirectory/abilitiesDirectory";
+import { PowerCore } from "./UserController";
 
 export type CreatureAttributes = {
+  id: number;
   name: string;
   currentHealth: number;
   maxHealth: number;
   defense: number;
   abilities: Ability[];
+  powerCore: PowerCore;
 };
 
 type CreatureEvents = {

@@ -11,41 +11,43 @@ import { Creature } from "../../components/Creature/Creature";
 import { useCreatureAttributes } from "../../hooks/useCreatureAttributes";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 import { popUpController } from "../../controllers/PopUpController";
-import {
-  abilitiesDirectory,
-  Ability,
-} from "../../data/abilitiesDirectory/abilitiesDirectory";
+import { Ability } from "../../data/abilitiesDirectory/abilitiesDirectory";
 import { getEnemyAbility } from "./utilities/enemySimulationFunctions";
+import { mapAbilities } from "./utilities/parserFunctions";
 
 export const Home: FC = () => {
   const audioRef = useRef(new Audio(fireballSound));
-  const mapAbilities = (abilityNames: string[]) => {
-    return abilityNames.map((name) => {
-      const ability = abilitiesDirectory[name];
-      if (!ability) {
-        throw new Error(`Ability "${name}" not found in the directory.`);
-      }
-      return ability;
-    });
-  };
 
   const user = useRef(
     new CreatureController({
       name: "User",
+      id: new Date().getTime(),
       currentHealth: 100,
       maxHealth: 100,
       defense: 5,
-      abilities: mapAbilities(["fireball", "simpleEnergyBeam"]), // Array of ability names
+      abilities: mapAbilities(["fireball", "simpleEnergyBeam"]),
+      powerCore: {
+        flight: 1,
+        defense: 4,
+        offense: 2,
+      },
     }),
   );
 
   const enemy = useRef(
     new CreatureController({
       name: "Enemy",
+      id: new Date().getTime(),
+
       currentHealth: 80,
       maxHealth: 80,
       defense: 3,
-      abilities: mapAbilities(["simpleEnergyBeam"]), // Array of ability names
+      abilities: mapAbilities(["simpleEnergyBeam"]),
+      powerCore: {
+        flight: 2,
+        defense: 5,
+        offense: 3,
+      },
     }),
   );
 

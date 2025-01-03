@@ -1,49 +1,52 @@
 import { EventEmitter } from "../coreClasses/EventEmitter";
-import { CreatureController } from "./CreatureController";
+import { CreatureAttributes } from "./CreatureController";
 
-type Rewards = {
-  gems: number;
-  weapons: string[];
-  elixirs: number;
-  [key: string]: any; // Allows for future extension
+export type PowerCore = {
+  flight: number;
+  defense: number;
+  offense: number;
 };
 
 type UserAttributes = {
   username: string;
-  level: number;
   xp: number;
-  balance: number; // In-game currency balance
-  rewards: Rewards;
+  level: number;
+  balance: number;
+  powerCore: PowerCore;
+  creatures: CreatureAttributes[];
+  currentCreatureId: number | undefined;
 };
 
 type UserEvents = {
-  xpChange: { xp: number; level: number };
-  rewardChange: Rewards;
-  creatureDeath: { name: string };
-  creatureEvolution: { name: string; newForm: string };
-  spending: { amount: number; balance: number };
+  attributeChange: Partial<UserAttributes>;
+  creatureChange: CreatureAttributes;
+  currentCreatureChange: CreatureAttributes;
 };
 
 export class UserController extends EventEmitter<UserEvents> {
   private attributes: UserAttributes;
-  private creatures: CreatureController[];
+  private creatures: Map<number, CreatureAttributes>;
 
   constructor(
-    username: string,
-    level: number,
-    xp: number,
-    balance: number,
-    rewards: Rewards = { gems: 0, weapons: [], elixirs: 0 },
-    creatures: CreatureController[] = [],
+    options: Omit<UserAttributes, "currentCreatureId"> & {
+      creatures: CreatureAttributes[];
+    },
   ) {
     super();
-    this.attributes = { username, level, xp, balance, rewards };
-    this.creatures = creatures;
+    this.attributes = {
+      ...options,
+      currentCreatureId: options.creatures[0]?.id || new Date().getTime(), // Default to the first creature
+    };
 
-    // Subscribe to creature events
-    this.creatures.forEach((creature) => {
-      creature.on("death", (data) => this.handleCreatureDeath(data.name));
-    });
+    this.creatures = new Map(
+      options.creatures.map((creature) => [creature.id, creature]),
+    );
+  }
+
+  private updateAttributes(updates: Partial<UserAttributes>): void {
+    const updatedAttributes = { ...this.attributes, ...updates };
+    this.attributes = updatedAttributes;
+    this.emit("attributeChange", updatedAttributes);
   }
 
   // Add XP and handle level up
@@ -51,62 +54,88 @@ export class UserController extends EventEmitter<UserEvents> {
     const newXp = this.attributes.xp + amount;
     let newLevel = this.attributes.level;
 
-    // Level up logic (e.g., every 100 XP increases level by 1)
     while (newXp >= newLevel * 100) {
       newLevel++;
     }
 
-    this.attributes = { ...this.attributes, xp: newXp, level: newLevel };
-    this.emit("xpChange", { xp: newXp, level: newLevel });
+    this.updateAttributes({ xp: newXp, level: newLevel });
   }
 
-  // Add to rewards
-  addReward(type: keyof Rewards, amount: any): void {
-    const newRewards = { ...this.attributes.rewards };
-
-    if (typeof newRewards[type] === "number") {
-      // Increment numeric rewards (e.g., gems, elixirs)
-      newRewards[type] += amount;
-    } else if (Array.isArray(newRewards[type])) {
-      // Append to array-based rewards (e.g., weapons)
-      newRewards[type].push(amount);
-    } else {
-      // Handle custom reward types
-      newRewards[type] = (newRewards[type] || 0) + amount;
-    }
-
-    this.attributes = { ...this.attributes, rewards: newRewards };
-    this.emit("rewardChange", newRewards);
+  // Manage balance
+  addBalance(amount: number): void {
+    const newBalance = this.attributes.balance + amount;
+    this.updateAttributes({ balance: newBalance });
   }
 
-  // Deduct balance (e.g., for in-game spending)
   spend(amount: number): void {
     if (amount > this.attributes.balance) {
       throw new Error("Insufficient balance");
     }
     const newBalance = this.attributes.balance - amount;
-    this.attributes = { ...this.attributes, balance: newBalance };
-    this.emit("spending", { amount, balance: newBalance });
+    this.updateAttributes({ balance: newBalance });
   }
 
-  // Add a new creature
-  addCreature(creature: CreatureController): void {
-    this.creatures.push(creature);
-    creature.on("death", (data) => this.handleCreatureDeath(data.name));
+  // Manage creatures
+  addCreature(creature: CreatureAttributes): void {
+    if (this.creatures.has(creature.id)) {
+      throw new Error(`Creature with ID ${creature.id} already exists.`);
+    }
+    this.creatures.set(creature.id, creature);
+    this.emit("attributeChange", {
+      creatures: Array.from(this.creatures.values()),
+    });
   }
 
-  // Handle creature death
-  private handleCreatureDeath(name: string): void {
-    this.emit("creatureDeath", { name });
+  updateCreature(
+    creatureId: number,
+    updates: Partial<CreatureAttributes>,
+  ): void {
+    const creature = this.creatures.get(creatureId);
+    if (!creature) {
+      throw new Error(`Creature with ID ${creatureId} not found.`);
+    }
+
+    const updatedCreature = { ...creature, ...updates };
+    this.creatures.set(creatureId, updatedCreature);
+    this.emit("creatureChange", updatedCreature);
+  }
+
+  getCreature(creatureId: number): CreatureAttributes | undefined {
+    return this.creatures.get(creatureId);
+  }
+
+  removeCreature(creatureId: number): void {
+    if (!this.creatures.has(creatureId)) {
+      throw new Error(`Creature with ID ${creatureId} not found.`);
+    }
+    this.creatures.delete(creatureId);
+    this.emit("attributeChange", {
+      creatures: Array.from(this.creatures.values()),
+    });
+  }
+
+  setCurrentCreature(creatureId: number): void {
+    if (!this.creatures.has(creatureId)) {
+      throw new Error(`Creature with ID ${creatureId} not found.`);
+    }
+    this.updateAttributes({ currentCreatureId: creatureId });
+    this.emit("currentCreatureChange", this.creatures.get(creatureId)!);
+  }
+
+  getCurrentCreature(): CreatureAttributes | null {
+    const currentCreatureId = this.attributes.currentCreatureId;
+    return currentCreatureId
+      ? this.creatures.get(currentCreatureId) || null
+      : null;
+  }
+
+  // Get all creatures as an array
+  getAllCreatures(): CreatureAttributes[] {
+    return Array.from(this.creatures.values());
   }
 
   // Get the user's current state
   getState(): Readonly<UserAttributes> {
     return { ...this.attributes };
-  }
-
-  // Get all creatures
-  getCreatures(): Readonly<CreatureController[]> {
-    return [...this.creatures];
   }
 }
