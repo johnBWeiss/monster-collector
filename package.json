@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.47.10",
     "@tippyjs/react": "^4.2.6",
     "@types/react-router-dom": "^5.3.3",
     "react": "^18.3.1",
