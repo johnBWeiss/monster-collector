@@ -40,9 +40,6 @@ const ProtectedRoute = ({
 
     checkAuth();
   }, []);
-  console.log("Loading:", loading);
-  console.log("Authenticated:", isAuthenticated);
-  console.log("Has Completed Onboarding:", hasCompletedOnboarding);
 
   if (loading) return <div>Loading...</div>;
 
@@ -53,7 +50,7 @@ const ProtectedRoute = ({
   if (requireOnboarding && !hasCompletedOnboarding) {
     return <Navigate to="/onboarding" replace />;
   }
-  console.log("why not outlet working");
+
   // Render the protected content
   return <Outlet />;
 };
