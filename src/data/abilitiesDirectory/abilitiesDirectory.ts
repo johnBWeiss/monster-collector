@@ -13,7 +13,7 @@ export const abilitiesDirectory: Record<string, Ability> = {
     description: "Launches a fiery projectile that deals AOE damage.",
     image: () => import("../../assets/images/abilities/fireball.png"),
     audio: () => import("../../assets/sounds/attacks/fireAttackSound.mp3"), // Lazy load audio
-    baseStats: { damage: 20, ammo: 3, energy: 2 },
+    baseStats: { damage: 70, ammo: 3, energy: 2 },
   },
 
   electroBlast: {

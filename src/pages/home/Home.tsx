@@ -10,10 +10,10 @@ import { GameController } from "../../controllers/GameController";
 import { Creature } from "../../components/Creature/Creature";
 import { useCreatureAttributes } from "../../hooks/useCreatureAttributes";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
-import { popUpController } from "../../controllers/PopUpController";
 import { Ability } from "../../data/abilitiesDirectory/abilitiesDirectory";
 import { getEnemyAbility } from "./utilities/enemySimulationFunctions";
 import { mapAbilities } from "./utilities/parserFunctions";
+import { handleGameOver } from "./utilities/gameplayFunctions";
 
 export const Home: FC = () => {
   const audioRef = useRef(new Audio(fireballSound));
@@ -31,6 +31,7 @@ export const Home: FC = () => {
         defense: 4,
         offense: 2,
       },
+      balance: 100,
     }),
   );
 
@@ -48,6 +49,7 @@ export const Home: FC = () => {
         defense: 5,
         offense: 3,
       },
+      balance: 100,
     }),
   );
 
@@ -173,31 +175,6 @@ export const Home: FC = () => {
           ability,
         );
       }
-    };
-
-    const handleGameOver = ({ winner }: { winner: "user" | "enemy" }) => {
-      popUpController.emit("showPopUp", {
-        id: "gameOverPopup",
-        content: (
-          <div>
-            <h2>{winner === "user" ? "You Win!" : "You Lose!"}</h2>
-            <button
-              onClick={() =>
-                popUpController.emit("closePopUp", { id: "gameOverPopup" })
-              }
-              style={{
-                padding: "10px",
-                background: "blue",
-                color: "white",
-                borderRadius: "5px",
-                marginTop: "10px",
-              }}
-            >
-              Close
-            </button>
-          </div>
-        ),
-      });
     };
 
     gameController.current.on("turnChange", handleTurnChange);

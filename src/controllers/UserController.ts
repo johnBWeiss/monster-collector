@@ -61,6 +61,16 @@ export class UserController extends EventEmitter<UserEvents> {
     this.updateAttributes({ xp: newXp, level: newLevel });
   }
 
+  addPowerCore(powerCore: PowerCore): void {
+    const newPowerCore = {
+      flight: this.attributes.powerCore.flight + powerCore.flight,
+      defense: this.attributes.powerCore.defense + powerCore.defense,
+      offense: this.attributes.powerCore.offense + powerCore.offense,
+    };
+
+    this.updateAttributes({ powerCore: newPowerCore });
+  }
+
   // Manage balance
   addBalance(amount: number): void {
     const newBalance = this.attributes.balance + amount;

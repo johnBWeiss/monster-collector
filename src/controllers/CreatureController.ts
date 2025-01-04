@@ -10,6 +10,7 @@ export type CreatureAttributes = {
   defense: number;
   abilities: Ability[];
   powerCore: PowerCore;
+  balance: number;
 };
 
 type CreatureEvents = {
