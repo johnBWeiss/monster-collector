@@ -11,6 +11,11 @@ img {
   max-width: 100%;
 }
 
+.inner-section {
+  //padding: calc(100vw - 400px);
+  position: relative;
+}
+
 /* Battlefield Background */
 .battlefield {
   width: 100vw;
@@ -23,8 +28,8 @@ img {
 .creatures-container {
   width: 370px;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   gap: 40px;
 }
 

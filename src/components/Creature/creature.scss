@@ -2,7 +2,8 @@
   justify-content: center;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 32px;
+  flex-direction: column;
 }
 
 .creature-img {
@@ -10,11 +11,6 @@
   z-index: 2;
   position: relative;
 
-  &.is-enemy {
-    width: 110px;
-
-    z-index: 0;
-  }
 }
 
 .creature-life-bar {
@@ -26,8 +22,8 @@
   width: 40px;
   border-radius: 50%;
   position: absolute;
-  right: 80px;
-  bottom: 60px;
+  //right: 80px;
+  //bottom: 60px;
   animation: heroAttack 1s infinite linear;
   display: none;
 
@@ -37,8 +33,8 @@
 
   &.is-enemy {
     animation: enemyAttack 1s infinite linear;
-    bottom: 50px;
-    right: 170px
+    //bottom: 50px;
+    //right: 170px
 
   }
 
@@ -58,7 +54,7 @@
     opacity: 1;
   }
   100% {
-    transform: translate(-180px, -180px) scale(3.5);
+    transform: translate(-220px, 0) scale(2.5);
   }
 }
 
@@ -68,7 +64,7 @@
     opacity: 1;
   }
   100% {
-    transform: translate(-250px, -200px) scale(1.5);
+    transform: translate(-250px, 0) scale(1.5);
   }
 }
 
@@ -78,7 +74,7 @@
     opacity: 1;
   }
   100% {
-    transform: translate(250px, 200px) scale(1.5);
+    transform: translate(250px, 0px) scale(1.5);
   }
 }
 
@@ -88,7 +84,7 @@
     opacity: 1;
   }
   100% {
-    transform: translate(180px, 180px) scale(3.5);
+    transform: translate(220px, 0) scale(2.5);
   }
 }
 
@@ -97,13 +93,13 @@
     transform: translate(0, 0);
   }
   25% {
-    transform: translate(-10px, -5px);
+    transform: translate(-10px, 0);
   }
   50% {
-    transform: translate(-15px, -10px);
+    transform: translate(-15px, 0);
   }
   75% {
-    transform: translate(-7px, -5px);
+    transform: translate(-7px, 0);
   }
   100% {
     transform: translate(0, 0);
@@ -115,13 +111,13 @@
     transform: translate(0, 0);
   }
   25% {
-    transform: translate(10px, 5px);
+    transform: translate(10px, 0);
   }
   50% {
-    transform: translate(15px, 10px);
+    transform: translate(15px, 0);
   }
   75% {
-    transform: translate(7px, 5px);
+    transform: translate(7px, 0);
   }
   100% {
     transform: translate(0, 0);

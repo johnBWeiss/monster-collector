@@ -1,10 +1,10 @@
 import React from "react";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 import "./creature.scss";
-import { CreatureStats } from "./components/CreatureStats/CreatureStats";
-import { AbilityCard } from "./components/AbilityCard/AbilityCard";
 import { CreatureAttributes } from "../../controllers/CreatureController";
 import { Ability } from "../../data/abilitiesDirectory/abilitiesDirectory";
+import { AbilityCard } from "./components/AbilityCard/AbilityCard";
+import { CreatureStats } from "./components/CreatureStats/CreatureStats";
 
 export type CreatureProps = {
   imgSrc: string;
@@ -38,9 +38,6 @@ export const Creature: React.FC<CreatureProps> = ({
       className={classNameParserCore(
         "creature-container relative fit-content",
         className,
-        {
-          "flex-row-reverse": isEnemy,
-        },
       )}
       onClick={onClick}
     >
@@ -54,19 +51,6 @@ export const Creature: React.FC<CreatureProps> = ({
             xp={99}
             level={4}
           />
-
-          {/* Ability Cards for User Only */}
-          {!isEnemy && onAbilityUse && (
-            <div className={"flex flex-1 gap-6 flex-wrap"}>
-              {abilities?.map((ability) => (
-                <AbilityCard
-                  key={ability.id}
-                  ability={ability}
-                  onClick={(ability) => onAbilityUse(ability)}
-                />
-              ))}
-            </div>
-          )}
         </div>
       )}
       <img
@@ -91,6 +75,20 @@ export const Creature: React.FC<CreatureProps> = ({
           }}
         />
       )}
+      {/* Ability Cards for User Only */}
+      {
+        <div className={"flex  gap-6 flex-wrap"}>
+          {abilities?.map((ability) => (
+            <AbilityCard
+              key={ability.id}
+              ability={ability}
+              onClick={
+                !isEnemy ? (ability) => onAbilityUse?.(ability) : undefined
+              }
+            />
+          ))}
+        </div>
+      }
     </div>
   );
 };

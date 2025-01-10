@@ -1,8 +1,8 @@
 import { PageSection } from "../../coreComponents/pageSection/PageSection";
 import React, { FC, useEffect, useRef, useState } from "react";
-import background from "../../assets/images/robots/backgrounds/robotBackground4.png";
-import yogi1Back from "../../assets/images/robots/characters/hero1Back.png";
-import baddy1 from "../../assets/images/robots/characters/hero2.png";
+import background from "../../assets/images/robots/backgrounds/background5.webp";
+import yogi1Back from "../../assets/images/robots/characters/hero1.png";
+import baddy1 from "../../assets/images/robots/characters/enemy3.png";
 import fireballSound from "../../assets/sounds/attacks/fireAttackSound.mp3";
 import "./home.scss";
 import { CreatureController } from "../../controllers/CreatureController";
@@ -140,6 +140,7 @@ export const Home: FC = () => {
 
   const handleHeroShoot = (ability: Ability) => {
     if (gameController.current.getTurn() === "user" && !isTurnLocked) {
+      console.log("hero shoot");
       setUserProjectileAnimation(ability.id);
       handleAttack(
         user.current,
@@ -189,33 +190,35 @@ export const Home: FC = () => {
   return (
     <PageSection>
       <img src={background} alt="background" className="battlefield" />
-      <div className="creatures-container">
-        {/* Enemy Section */}
-        <Creature
-          imgSrc={baddy1}
-          onClick={() => console.warn("Enemy can't be clicked!")}
-          projectileSrc={enemyAbilityImg}
-          shouldShowProjectile={!!enemyAbilityImg}
-          isEnemy
-          className={classNameParserCore("m-right-auto", {
-            "hit-recoil-left": isEnemyShaking,
-          })}
-          creatureAttributes={enemyAttributes}
-          projectileAnimation={enemyProjectileAnimation}
-        />
-        {/* User Section */}
-        <Creature
-          imgSrc={yogi1Back}
-          onClick={() => console.log("Hero clicked")} // Optional action
-          onAbilityUse={(ability: Ability) => handleHeroShoot(ability)}
-          projectileSrc={userAbilityImg}
-          shouldShowProjectile={!!userAbilityImg}
-          className={classNameParserCore("m-left-auto", {
-            "hit-recoil-right": isUserShaking,
-          })}
-          creatureAttributes={userAttributes}
-          projectileAnimation={userProjectileAnimation}
-        />
+      <div className="inner-section">
+        <div className="creatures-container">
+          {/* Enemy Section */}
+          <Creature
+            imgSrc={baddy1}
+            onClick={() => console.warn("Enemy can't be clicked!")}
+            projectileSrc={enemyAbilityImg}
+            shouldShowProjectile={!!enemyAbilityImg}
+            isEnemy
+            imgClassName={classNameParserCore({
+              "hit-recoil-left": isEnemyShaking,
+            })}
+            creatureAttributes={enemyAttributes}
+            projectileAnimation={enemyProjectileAnimation}
+          />
+          {/* User Section */}
+          <Creature
+            imgSrc={yogi1Back}
+            onClick={() => console.log("Hero clicked")} // Optional action
+            onAbilityUse={(ability: Ability) => handleHeroShoot(ability)}
+            projectileSrc={userAbilityImg}
+            shouldShowProjectile={!!userAbilityImg}
+            imgClassName={classNameParserCore({
+              "hit-recoil-right": isUserShaking,
+            })}
+            creatureAttributes={userAttributes}
+            projectileAnimation={userProjectileAnimation}
+          />
+        </div>
       </div>
     </PageSection>
   );
