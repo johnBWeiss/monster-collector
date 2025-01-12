@@ -7,7 +7,6 @@ import { AbilityCard } from "./components/AbilityCard/AbilityCard";
 import { CreatureStats } from "./components/CreatureStats/CreatureStats";
 
 export type CreatureProps = {
-  imgSrc: string;
   projectileSrc: string;
   onClick: (event: React.MouseEvent) => void;
   shouldShowProjectile: boolean;
@@ -21,7 +20,6 @@ export type CreatureProps = {
 };
 
 export const Creature: React.FC<CreatureProps> = ({
-  imgSrc,
   onClick,
   className,
   imgClassName,
@@ -32,7 +30,8 @@ export const Creature: React.FC<CreatureProps> = ({
   onAbilityUse,
   projectileAnimation,
 }) => {
-  const { currentHealth, maxHealth, abilities } = creatureAttributes || {};
+  const { currentHealth, maxHealth, abilities, image } =
+    creatureAttributes || {};
   return (
     <div
       className={classNameParserCore(
@@ -54,7 +53,7 @@ export const Creature: React.FC<CreatureProps> = ({
         </div>
       )}
       <img
-        src={imgSrc}
+        src={image}
         className={classNameParserCore(
           "creature-img",
           { "is-enemy": isEnemy },

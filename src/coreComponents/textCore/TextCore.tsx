@@ -6,7 +6,7 @@ import { classNameParserCore } from "../../coreFunctions/classNameParserCore/cla
 export type TextCoreProps = {
   text: string | undefined;
   color?: string;
-  fontSize?: string;
+  fontSize?: number;
   fontWeight?: string;
   textAlign?: "left" | "center" | "right";
   textDecoration?: "none" | "underline" | "line-through";
@@ -17,7 +17,7 @@ export type TextCoreProps = {
 export const TextCore: React.FC<TextCoreProps> = ({
   text = "",
   color,
-  fontSize = "14",
+  fontSize = 14,
   fontWeight = "normal",
   textAlign = "left",
   textDecoration = "none",

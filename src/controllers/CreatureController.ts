@@ -11,6 +11,7 @@ export type CreatureAttributes = {
   abilities: Ability[];
   powerCore: PowerCore;
   balance: number;
+  image?: string;
 };
 
 type CreatureEvents = {

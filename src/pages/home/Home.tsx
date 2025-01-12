@@ -25,6 +25,7 @@ export const Home: FC = () => {
       currentHealth: 100,
       maxHealth: 100,
       defense: 5,
+      image: yogi1Back,
       abilities: mapAbilities(["fireball", "simpleEnergyBeam"]),
       powerCore: {
         flight: 1,
@@ -39,7 +40,7 @@ export const Home: FC = () => {
     new CreatureController({
       name: "Enemy",
       id: new Date().getTime(),
-
+      image: baddy1,
       currentHealth: 80,
       maxHealth: 80,
       defense: 3,
@@ -194,7 +195,6 @@ export const Home: FC = () => {
         <div className="creatures-container">
           {/* Enemy Section */}
           <Creature
-            imgSrc={baddy1}
             onClick={() => console.warn("Enemy can't be clicked!")}
             projectileSrc={enemyAbilityImg}
             shouldShowProjectile={!!enemyAbilityImg}
@@ -207,7 +207,6 @@ export const Home: FC = () => {
           />
           {/* User Section */}
           <Creature
-            imgSrc={yogi1Back}
             onClick={() => console.log("Hero clicked")} // Optional action
             onAbilityUse={(ability: Ability) => handleHeroShoot(ability)}
             projectileSrc={userAbilityImg}

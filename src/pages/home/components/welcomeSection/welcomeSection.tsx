@@ -17,23 +17,23 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = () => {
   return (
     <div className="flex height-100 width-100">
       <div className="welcome-section-image-container border-radius-16">
-        <div className="welcome-section-image">
-        </div>
+        <div className="welcome-section-image"></div>
       </div>
       <div className="welcome-section-content">
         <div
           className={classNameParserCore(
-            "flex flex-column gap-4 justify-center align-center"
+            "flex flex-column gap-4 justify-center align-center",
           )}
         >
-          <TextCore text="Robo builder" color="white" fontSize="60" />
-          <TextCore text="avatar creator" color="white" fontSize="20" />
+          <TextCore text="Robo builder" color="white" fontSize={60} />
+          <TextCore text="avatar creator" color="white" fontSize={20} />
           <div className="p-top-50">
             <ButtonCore
               text="Sign in"
-              onClick={() =>{}
-                  // navigateTo(`/${NAVIGATION_PATHS.inventory}`)
-            }
+              onClick={
+                () => {}
+                // navigateTo(`/${NAVIGATION_PATHS.inventory}`)
+              }
             />
           </div>
         </div>

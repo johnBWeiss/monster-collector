@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../../supabaseClient";
 import { useNavigate } from "react-router";
 
+import CreatureSelection from "../../components/creatureSelection/CreatureSelection";
+import { PageSection } from "../../coreComponents/pageSection/PageSection";
+
 export const Onboarding: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +50,7 @@ export const Onboarding: React.FC = () => {
       }
     };
 
-    checkOnboardingStatus();
+    // checkOnboardingStatus();
   }, [navigate]);
 
   const handleSelectCreature = async (creatureId: string) => {
@@ -85,36 +88,96 @@ export const Onboarding: React.FC = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  // if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
-      <h1>Choose Your Starter Creature</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <div>
-        {/* Replace these with your actual creature options */}
-        <button
-          onClick={() =>
-            handleSelectCreature("00000000-0000-0000-0000-000000000001")
-          }
-        >
-          Select Dragon
-        </button>
-        <button
-          onClick={() =>
-            handleSelectCreature("00000000-0000-0000-0000-000000000002")
-          }
-        >
-          Select Phoenix
-        </button>
-        <button
-          onClick={() =>
-            handleSelectCreature("00000000-0000-0000-0000-000000000003")
-          }
-        >
-          Select Unicorn
-        </button>
-      </div>
-    </div>
+    <PageSection>
+      <CreatureSelection />
+    </PageSection>
   );
+
+  {
+    /*<div>*/
+  }
+  {
+    /*  <h1>Choose Your Starter Creature</h1>*/
+  }
+  {
+    /*  {error && <p style={{ color: "red" }}>{error}</p>}*/
+  }
+  {
+    /*  <div>*/
+  }
+  {
+    /*    /!* Replace these with your actual creature options *!/*/
+  }
+  {
+    /*    <button*/
+  }
+  {
+    /*      onClick={() =>*/
+  }
+  {
+    /*        handleSelectCreature("00000000-0000-0000-0000-000000000001")*/
+  }
+  {
+    /*      }*/
+  }
+  {
+    /*    >*/
+  }
+  {
+    /*      Select Dragon*/
+  }
+  {
+    /*    </button>*/
+  }
+  {
+    /*    <button*/
+  }
+  {
+    /*      onClick={() =>*/
+  }
+  {
+    /*        handleSelectCreature("00000000-0000-0000-0000-000000000002")*/
+  }
+  {
+    /*      }*/
+  }
+  {
+    /*    >*/
+  }
+  {
+    /*      Select Phoenix*/
+  }
+  {
+    /*    </button>*/
+  }
+  {
+    /*    <button*/
+  }
+  {
+    /*      onClick={() =>*/
+  }
+  {
+    /*        handleSelectCreature("00000000-0000-0000-0000-000000000003")*/
+  }
+  {
+    /*      }*/
+  }
+  {
+    /*    >*/
+  }
+  {
+    /*      Select Unicorn*/
+  }
+  {
+    /*    </button>*/
+  }
+  {
+    /*  </div>*/
+  }
+  {
+    /*</div>*/
+  }
 };
