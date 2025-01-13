@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 
 interface ValidationRule {
   rule: (value: string) => boolean;
@@ -13,6 +14,7 @@ interface InputCoreProps {
   validationRules?: ValidationRule[];
   onValid?: (isValid: boolean) => void; // Callback to notify the parent of validity
   style?: React.CSSProperties;
+  className?: string;
 }
 
 export const InputCore: React.FC<InputCoreProps> = ({
@@ -23,6 +25,7 @@ export const InputCore: React.FC<InputCoreProps> = ({
   validationRules = [],
   onValid,
   style = {},
+  className,
 }) => {
   const [error, setError] = useState<string | null>(null);
 
@@ -44,7 +47,10 @@ export const InputCore: React.FC<InputCoreProps> = ({
   };
 
   return (
-    <div style={{ marginBottom: "10px" }}>
+    <div
+      style={{ marginBottom: "10px" }}
+      className={classNameParserCore("width-100", className)}
+    >
       <input
         type={type}
         placeholder={placeholder}

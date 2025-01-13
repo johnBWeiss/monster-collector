@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { InputCore } from "../../coreComponents/inputCore/InputCore";
 import { ButtonCore } from "../../coreComponents/buttonCore/ButtonCore";
+import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 
 export type LoginFormProps = {
   email: string;
@@ -39,8 +40,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   return (
     <div
-      style={{ maxWidth: "400px", textAlign: "center" }}
-      className={className}
+      style={{ width: "280px", textAlign: "center" }}
+      className={classNameParserCore(
+        "flex flex-column justify-center align-center",
+        className,
+      )}
     >
       <InputCore
         type="email"

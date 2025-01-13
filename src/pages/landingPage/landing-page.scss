@@ -1,8 +1,13 @@
-.presenter-image {
-  max-width: 220px;
-  transition: 0.5s all ease-in-out;
+.landing-page-container {
+  height: 350px;
+}
 
-  &.is-input-mode {
-    max-width: 70px;
-  }
+.presenter-image {
+
+  max-width: 220px;
+  transition: 0.2s all ease-in-out;
+
+  //&.is-input-mode {
+  //  max-width: 70px;
+  //}
 }

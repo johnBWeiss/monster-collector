@@ -19,6 +19,7 @@ export const LandingPage = (props: LandingPageProps) => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [isCheckingSession, setIsCheckingSession] = useState<boolean>(true); // New state
+  const [showLoginForm, setShowLoginForm] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -156,18 +157,21 @@ export const LandingPage = (props: LandingPageProps) => {
 
   return (
     <PageSection>
-      <div className="flex flex-column gap-24 justify-center align-center">
+      <div className="flex flex-column space-between align-center landing-page-container">
         <TextCore text={"Gearlings"} className={"text-white"} fontSize={64} />
-        <img
-          src={presenter}
-          alt={"presenter"}
-          className={classNameParserCore("presenter-image", {
-            "is-input-mode": isInputMode,
-          })}
-        />
+        {!isInputMode && (
+          <img
+            src={presenter}
+            alt={"presenter"}
+            className={classNameParserCore("presenter-image fade-scale-in", {
+              "is-input-mode": isInputMode,
+            })}
+          />
+        )}
         {isInputMode && (
           <LoginForm
-            className={classNameParserCore({ "fade-scale-in": isInputMode })}
+            className={"fade-in"}
+            // className={classNameParserCore({ "fade-in": isInputMode })}
             email={email}
             password={password}
             onEmailChange={setEmail}

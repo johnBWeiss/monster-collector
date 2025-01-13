@@ -153,6 +153,7 @@ export const Login: React.FC = () => {
       loading={loading}
       error={error}
       successMessage={successMessage}
+      className={"fade-in"}
     />
     // <div
     //   style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}
