@@ -1,6 +1,7 @@
 import React from "react";
 import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
 import { TextCore } from "../textCore/TextCore";
+
 export type ButtonCoreProps = {
   text: string | undefined;
   onClick: () => void;
@@ -20,8 +21,8 @@ export const ButtonCore: React.FC<ButtonCoreProps> = ({
   return (
     <div
       className={classNameParserCore(
-        "pointer p-top-bottom-5 p-right-left-10 flex justify-center",
-        className
+        "pointer p-top-bottom-5 p-right-left-10 flex justify-center hover-scale",
+        className,
       )}
       style={{
         backgroundColor,

@@ -1,9 +1,18 @@
+import { PageSection } from "../../coreComponents/pageSection/PageSection";
+import presenter from "../../assets/images/robots/characters/presenter.png";
+import { ButtonCore } from "../../coreComponents/buttonCore/ButtonCore";
+import { TextCore } from "../../coreComponents/textCore/TextCore";
+import "./landing-page.scss";
 import React, { useEffect, useState } from "react";
-import { supabase } from "../../../supabaseClient";
+import { classNameParserCore } from "../../coreFunctions/classNameParserCore/classNameParserCore";
+import { LoginForm } from "../login/LoginForm";
 import { useNavigate } from "react-router";
-import { LoginForm } from "./LoginForm";
+import { supabase } from "../../../supabaseClient";
 
-export const Login: React.FC = () => {
+export type LandingPageProps = {};
+
+export const LandingPage = (props: LandingPageProps) => {
+  const [isInputMode, setIsInputMode] = useState(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -42,9 +51,9 @@ export const Login: React.FC = () => {
 
         // Redirect based on whether the user has a current creature
         if (userData?.current_creature_id) {
-          navigate("/battlefield");
+          // navigate("/battlefield");
         } else {
-          navigate("/onboarding");
+          // navigate("/onboarding");
         }
       } else {
         setIsCheckingSession(false); // No session; show login page
@@ -75,11 +84,11 @@ export const Login: React.FC = () => {
         .single();
 
       if (userError || !userData) {
-        navigate("/onboarding");
+        // navigate("/onboarding");
       } else if (userData.current_creature_id) {
-        navigate("/battlefield");
+        // navigate("/battlefield");
       } else {
-        navigate("/onboarding");
+        // navigate("/onboarding");
       }
     }
 
@@ -135,89 +144,43 @@ export const Login: React.FC = () => {
 
     setLoading(false);
 
-    navigate("/onboarding");
+    // navigate("/onboarding");
   };
 
-  if (isCheckingSession) {
-    return <div>Loading...</div>; // Show a loading screen while checking session
-  }
+  // if (isCheckingSession) {
+  //   return <div>Loading...</div>; // Show a loading screen while checking session
+  // }
+  const onCLick = () => {
+    setIsInputMode((prev) => !prev);
+  };
 
   return (
-    <LoginForm
-      email={email}
-      password={password}
-      onEmailChange={setEmail}
-      onPasswordChange={setPassword}
-      onSignIn={handleSignIn}
-      onSignUp={handleSignUp}
-      loading={loading}
-      error={error}
-      successMessage={successMessage}
-    />
-    // <div
-    //   style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}
-    // >
-    //   <h1>Login</h1>
-    //   <input
-    //     type="email"
-    //     placeholder="Email"
-    //     value={email}
-    //     onChange={(e) => setEmail(e.target.value)}
-    //     style={{
-    //       width: "100%",
-    //       padding: "10px",
-    //       margin: "10px 0",
-    //       borderRadius: "5px",
-    //       border: "1px solid #ccc",
-    //     }}
-    //   />
-    //   <input
-    //     type="password"
-    //     placeholder="Password"
-    //     value={password}
-    //     onChange={(e) => setPassword(e.target.value)}
-    //     style={{
-    //       width: "100%",
-    //       padding: "10px",
-    //       margin: "10px 0",
-    //       borderRadius: "5px",
-    //       border: "1px solid #ccc",
-    //     }}
-    //   />
-    //   <button
-    //     onClick={handleSignIn}
-    //     disabled={loading}
-    //     style={{
-    //       width: "100%",
-    //       padding: "10px",
-    //       margin: "10px 0",
-    //       background: "#007bff",
-    //       color: "white",
-    //       border: "none",
-    //       borderRadius: "5px",
-    //       cursor: "pointer",
-    //     }}
-    //   >
-    //     {loading ? "Logging in..." : "Login"}
-    //   </button>
-    //   <button
-    //     onClick={handleSignUp}
-    //     disabled={loading}
-    //     style={{
-    //       width: "100%",
-    //       padding: "10px",
-    //       margin: "10px 0",
-    //       background: "#28a745",
-    //       color: "white",
-    //       border: "none",
-    //       borderRadius: "5px",
-    //       cursor: "pointer",
-    //     }}
-    //   >
-    //     {loading ? "Signing up..." : "Sign Up"}
-    //   </button>
-    //   {error && <p style={{ color: "red" }}>{error}</p>}
-    //   {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-    // </div>
+    <PageSection>
+      <div className="flex flex-column gap-24 justify-center align-center">
+        <TextCore text={"Gearlings"} className={"text-white"} fontSize={64} />
+        <img
+          src={presenter}
+          alt={"presenter"}
+          className={classNameParserCore("presenter-image", {
+            "is-input-mode": isInputMode,
+          })}
+        />
+        {isInputMode && (
+          <LoginForm
+            className={classNameParserCore({ "fade-scale-in": isInputMode })}
+            email={email}
+            password={password}
+            onEmailChange={setEmail}
+            onPasswordChange={setPassword}
+            onSignIn={handleSignIn}
+            onSignUp={handleSignUp}
+            loading={loading}
+            error={error}
+            successMessage={successMessage}
+          />
+        )}
+        <ButtonCore text={"Play"} onClick={onCLick} />
+      </div>
+    </PageSection>
   );
 };
