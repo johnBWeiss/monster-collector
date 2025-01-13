@@ -35,7 +35,7 @@ export const InputCore: React.FC<InputCoreProps> = ({
 
     // Validate against rules
     for (const { rule, message } of validationRules) {
-      if (!rule(inputValue)) {
+      if (!rule(inputValue) && inputValue.length > 0) {
         setError(message);
         if (onValid) onValid(false);
         return;

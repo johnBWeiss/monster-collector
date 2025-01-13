@@ -15,6 +15,7 @@ export type LoginFormProps = {
   successMessage?: string | null;
   className?: string;
 };
+
 export const LoginForm: React.FC<LoginFormProps> = ({
   email,
   password,
@@ -30,9 +31,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
   const [isPasswordValid, setIsPasswordValid] = useState<boolean>(false);
 
+  const handleEmailChange = (value: string) => {
+    onEmailChange(value);
+  };
+
+  const handlePasswordChange = (value: string) => {
+    onPasswordChange(value);
+  };
+
   const handleLogin = () => {
     if (isEmailValid && isPasswordValid) {
-      console.log("Logging in with:", { email, password });
+      onSignIn();
     } else {
       console.error("Invalid input!");
     }
@@ -50,7 +59,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         type="email"
         placeholder="Email"
         value={email}
-        onChange={onEmailChange}
+        onChange={handleEmailChange}
         validationRules={[
           {
             rule: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
@@ -63,7 +72,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         type="password"
         placeholder="Password"
         value={password}
-        onChange={onPasswordChange}
+        onChange={handlePasswordChange}
         validationRules={[
           {
             rule: (value) => value.length >= 6,
@@ -76,14 +85,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         ]}
         onValid={setIsPasswordValid}
       />
+      {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+      {successMessage && (
+        <p style={{ color: "green", marginTop: "10px" }}>{successMessage}</p>
+      )}
       <ButtonCore
         text={"Login"}
         onClick={handleLogin}
-        // style={{
-        //     background: isEmailValid && isPasswordValid ? "#007bff" : "#ccc",
-        //     cursor: isEmailValid && isPasswordValid ? "pointer" : "not-allowed",
-        // }}
-        // disabled={!isEmailValid || !isPasswordValid}
+        // disabled={loading || !isEmailValid || !isPasswordValid}
       />
     </div>
   );
