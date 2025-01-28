@@ -12,6 +12,7 @@ export type TextCoreProps = {
   textDecoration?: "none" | "underline" | "line-through";
   className?: string;
   textClassName?: string;
+  onClick?: () => void;
 };
 
 export const TextCore: React.FC<TextCoreProps> = ({
@@ -23,6 +24,7 @@ export const TextCore: React.FC<TextCoreProps> = ({
   textDecoration = "none",
   className,
   textClassName,
+  onClick,
 }) => {
   const textRef = useRef<HTMLDivElement | null>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -71,6 +73,7 @@ export const TextCore: React.FC<TextCoreProps> = ({
         className={classNameParserCore(className)}
         style={style}
         ref={textRef}
+        onClick={onClick}
       >
         {text}
       </div>

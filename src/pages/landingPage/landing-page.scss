@@ -1,13 +1,13 @@
 .landing-page-container {
-  height: 350px;
+  //height: 350px;
 }
 
 .presenter-image {
 
   max-width: 220px;
-  transition: 0.2s all ease-in-out;
+  transition: 0.3s all ease-in-out;
 
-  //&.is-input-mode {
-  //  max-width: 70px;
-  //}
+  &.is-input-mode {
+    max-width: 120px;
+  }
 }
