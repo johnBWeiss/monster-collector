@@ -9,6 +9,7 @@ export type ButtonCoreProps = {
   borderRadius?: number;
   className?: string;
   width?: number;
+  style?: React.CSSProperties;
 };
 export const ButtonCore: React.FC<ButtonCoreProps> = ({
   text,
@@ -17,6 +18,7 @@ export const ButtonCore: React.FC<ButtonCoreProps> = ({
   borderRadius = 20,
   className,
   width = 120,
+  style,
 }) => {
   return (
     <div
@@ -25,6 +27,7 @@ export const ButtonCore: React.FC<ButtonCoreProps> = ({
         className,
       )}
       style={{
+        ...style,
         backgroundColor,
         borderRadius: `${borderRadius}px`,
         width: `${width}px`,

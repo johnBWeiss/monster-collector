@@ -16,22 +16,28 @@ export const LandingPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showLoginForm, setShowLoginForm] = useState<boolean>(false);
+  const [showLoginWithDelay, setShowLoginWithDelay] = useState(false);
   const [isSignIn, setIsSignIn] = useState<boolean>(true); // State to toggle between Sign In and Sign Up
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  const showLoginState = () => {
+    setShowLoginForm(true);
+    setTimeout(() => setShowLoginWithDelay(true), 250);
+  };
 
   useEffect(() => {
     const checkSession = async () => {
       const { data: sessionData, error: sessionError } =
         await supabase.auth.getSession();
       if (sessionError || !sessionData.session) {
-        setShowLoginForm(true);
+        showLoginState();
         return;
       }
 
       const userId = sessionData.session.user?.id;
       if (!userId) {
-        setShowLoginForm(true);
+        showLoginState();
         return;
       }
 
@@ -42,7 +48,7 @@ export const LandingPage: React.FC = () => {
         .single();
 
       if (userError || !userData) {
-        setShowLoginForm(true);
+        showLoginState();
       } else {
         if (userData.current_creature_id) {
           navigate("/battlefield");
@@ -110,7 +116,10 @@ export const LandingPage: React.FC = () => {
 
   return (
     <PageSection>
-      <div className="flex flex-column gap-8 align-center landing-page-container">
+      <div
+        className="flex flex-column gap-8 align-center landing-page-container transition"
+        style={{ height: showLoginForm ? "390px" : "340px" }}
+      >
         <TextCore text={"Gearlings"} className={"text-white"} fontSize={64} />
         <img
           src={presenter}
@@ -119,10 +128,10 @@ export const LandingPage: React.FC = () => {
             "is-input-mode": showLoginForm,
           })}
         />
-        {showLoginForm ? (
+        {showLoginWithDelay ? (
           <>
             <LoginForm
-              className={"fade-scale-in"}
+              className={"fade-scale-in-01"}
               email={email}
               password={password}
               onEmailChange={setEmail}
@@ -146,7 +155,13 @@ export const LandingPage: React.FC = () => {
             />
           </>
         ) : (
-          <ButtonCore text={"Play"} onClick={() => setShowLoginForm(true)} />
+          <ButtonCore
+            text={"Play"}
+            style={{ opacity: showLoginForm ? 0 : undefined }}
+            onClick={() => {
+              showLoginState();
+            }}
+          />
         )}
       </div>
     </PageSection>
