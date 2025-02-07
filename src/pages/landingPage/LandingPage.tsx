@@ -41,12 +41,13 @@ export const LandingPage: React.FC = () => {
         return;
       }
 
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("current_creature_id")
-        .eq("id", userId)
-        .single();
-
+      // const { data: userData, error: userError } = await supabase
+      //   .from("users")
+      //   .select("current_creature_id")
+      //   .eq("id", userId)
+      //   .single();
+      const userError = false;
+      const userData = { current_creature_id: "" };
       if (userError || !userData) {
         showLoginState();
       } else {
@@ -58,7 +59,7 @@ export const LandingPage: React.FC = () => {
       }
     };
 
-    checkSession();
+    // checkSession();
   }, [navigate]);
 
   const toggleForm = () => {
@@ -82,7 +83,8 @@ export const LandingPage: React.FC = () => {
 
     if (!isSignIn) {
       // Additional tasks for sign-up success, like inserting user data
-      const userId = response.data.user?.id;
+      const userId = "";
+      // const userId = response.data.user?.id;
       if (userId) {
         const { error: insertError } = await supabase.from("users").insert([
           {
@@ -113,7 +115,6 @@ export const LandingPage: React.FC = () => {
 
     setLoading(false);
   };
-
   return (
     <PageSection>
       <div

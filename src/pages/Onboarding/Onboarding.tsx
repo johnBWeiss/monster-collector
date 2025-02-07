@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "../../../supabaseClient";
 import { useNavigate } from "react-router";
 
@@ -6,7 +6,7 @@ import CreatureSelection from "../../components/creatureSelection/CreatureSelect
 import { PageSection } from "../../coreComponents/pageSection/PageSection";
 
 export const Onboarding: React.FC = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -53,131 +53,50 @@ export const Onboarding: React.FC = () => {
     // checkOnboardingStatus();
   }, [navigate]);
 
-  const handleSelectCreature = async (creatureId: string) => {
-    try {
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
+  const handleSelectCreature = useCallback(
+    async (creatureId: string) => {
+      try {
+        const { data: sessionData, error: sessionError } =
+          await supabase.auth.getSession();
 
-      if (sessionError) {
-        console.error("Error fetching session:", sessionError.message);
-        setError("Failed to fetch user session.");
-        return;
+        if (sessionError) {
+          console.error("Error fetching session:", sessionError.message);
+          setError("Failed to fetch user session.");
+          return;
+        }
+
+        const userId = sessionData?.session?.user?.id;
+        if (!userId) {
+          setError("No user session found.");
+          return navigate("/");
+        }
+
+        // Update the user's current creature ID in the database
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({ current_creature_id: creatureId })
+          .eq("id", userId);
+
+        if (updateError) {
+          console.error("Error updating user data:", updateError.message);
+          setError("Failed to update user data.");
+        } else {
+          navigate("/battlefield"); // Redirect to battlefield after selection
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        setError("An unexpected error occurred.");
       }
+    },
+    [navigate],
+  );
 
-      const userId = sessionData?.session?.user?.id;
-      if (!userId) {
-        setError("No user session found.");
-        return navigate("/");
-      }
-
-      // Update the user's current creature ID in the database
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({ current_creature_id: creatureId })
-        .eq("id", userId);
-
-      if (updateError) {
-        console.error("Error updating user data:", updateError.message);
-        setError("Failed to update user data.");
-      } else {
-        navigate("/battlefield"); // Redirect to battlefield after selection
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      setError("An unexpected error occurred.");
-    }
-  };
-
-  // if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <PageSection>
-      <CreatureSelection />
+      <CreatureSelection onSelectCreature={handleSelectCreature} />
     </PageSection>
   );
-
-  {
-    /*<div>*/
-  }
-  {
-    /*  <h1>Choose Your Starter Creature</h1>*/
-  }
-  {
-    /*  {error && <p style={{ color: "red" }}>{error}</p>}*/
-  }
-  {
-    /*  <div>*/
-  }
-  {
-    /*    /!* Replace these with your actual creature options *!/*/
-  }
-  {
-    /*    <button*/
-  }
-  {
-    /*      onClick={() =>*/
-  }
-  {
-    /*        handleSelectCreature("00000000-0000-0000-0000-000000000001")*/
-  }
-  {
-    /*      }*/
-  }
-  {
-    /*    >*/
-  }
-  {
-    /*      Select Dragon*/
-  }
-  {
-    /*    </button>*/
-  }
-  {
-    /*    <button*/
-  }
-  {
-    /*      onClick={() =>*/
-  }
-  {
-    /*        handleSelectCreature("00000000-0000-0000-0000-000000000002")*/
-  }
-  {
-    /*      }*/
-  }
-  {
-    /*    >*/
-  }
-  {
-    /*      Select Phoenix*/
-  }
-  {
-    /*    </button>*/
-  }
-  {
-    /*    <button*/
-  }
-  {
-    /*      onClick={() =>*/
-  }
-  {
-    /*        handleSelectCreature("00000000-0000-0000-0000-000000000003")*/
-  }
-  {
-    /*      }*/
-  }
-  {
-    /*    >*/
-  }
-  {
-    /*      Select Unicorn*/
-  }
-  {
-    /*    </button>*/
-  }
-  {
-    /*  </div>*/
-  }
-  {
-    /*</div>*/
-  }
 };
