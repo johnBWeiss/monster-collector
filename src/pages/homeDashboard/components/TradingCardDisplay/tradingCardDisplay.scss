@@ -1,12 +1,16 @@
-.card {
+@use "../../../../coreStyles/colors.scss";
+
+.trading-card-display {
   width: 260px;
+  min-height: 400px;
   background: linear-gradient(#1a1f2b, #22303e);
   border-radius: 16px;
-  border: 3px solid #4ec3f7;
+  border: 3px solid;
+  border-color: colors.$blue-4;
   padding: 12px;
   position: relative;
   color: white;
-  box-shadow: 0 0 20px #4ec3f777;
+  box-shadow: 0 0 20px colors.$blue-4;
   font-family: sans-serif;
 }
 
@@ -30,13 +34,16 @@
   height: 240px;
   background-size: contain;
   background-position: center;
-  border: 2px solid #4ec3f7;
+  border: 2px solid colors.$blue-4;
   border-radius: 8px;
   margin-bottom: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .title {
-  background: #4ec3f7;
+  background: colors.$blue-4;
   color: black;
   text-align: center;
   font-weight: bold;
@@ -83,7 +90,7 @@
 .diamond {
   width: 20px;
   height: 20px;
-  background: #4ec3f7;
+  background: colors.$blue-4;
   transform: rotate(45deg);
   border: 2px solid #222;
 }
