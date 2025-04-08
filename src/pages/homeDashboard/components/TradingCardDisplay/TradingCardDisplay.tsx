@@ -1,6 +1,8 @@
 import React from "react";
 import "./tradingCardDisplay.scss";
 import { TextCore } from "../../../../coreComponents/textCore/TextCore";
+import { COLORS } from "../../../../coreStyles/colors";
+
 type TradingCardDisplayProps = {
   title: string;
   typeLabel: string;
@@ -9,6 +11,7 @@ type TradingCardDisplayProps = {
   statLeft: number;
   statRight: number;
   backgroundImageUrl: string;
+  powerCoreImg: string;
 };
 
 export const TradingCardDisplay: React.FC<TradingCardDisplayProps> = ({
@@ -19,13 +22,10 @@ export const TradingCardDisplay: React.FC<TradingCardDisplayProps> = ({
   statLeft,
   statRight,
   backgroundImageUrl,
+  powerCoreImg,
 }) => {
   return (
     <div className="trading-card-display">
-      <div className="cost-circle">
-        <TextCore text={cost.toString()} className="text-base font-semibold" />
-      </div>
-
       <div className="title">
         <TextCore text={title} className="text-xl font-bold" />
       </div>
@@ -38,26 +38,15 @@ export const TradingCardDisplay: React.FC<TradingCardDisplayProps> = ({
         <TextCore text={typeLabel} className="text-sm font-medium" />
       </div>
 
-      <div className="description">
+      {/* <div className="description">
         <TextCore text={description} className="text-sm text-gray-700" />
-      </div>
+      </div> */}
 
       <div className="bottom-stats">
-        <div className="stat">
-          <TextCore
-            text={statLeft.toString()}
-            className="text-base font-semibold"
-          />
+        <div className="cost-circle">
+          <TextCore text={cost.toString()} color={COLORS["blue-4"]} />
         </div>
-
-        <div className="diamond" />
-
-        <div className="stat">
-          <TextCore
-            text={statRight.toString()}
-            className="text-base font-semibold"
-          />
-        </div>
+        <img src={powerCoreImg} width="50px" alt={title} />
       </div>
     </div>
   );
