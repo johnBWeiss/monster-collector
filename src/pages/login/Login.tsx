@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { supabase } from "../../../supabaseClient";
 import { useNavigate } from "react-router";
 import { LoginForm } from "./LoginForm";
 import { TextCore } from "../../coreComponents/textCore/TextCore";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -10,42 +11,16 @@ export const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [isSignIn, setIsSignIn] = useState<boolean>(true); // State to toggle between Sign In and Sign Up
+  const [isSignIn, setIsSignIn] = useState<boolean>(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
-
-      if (sessionError) {
-        console.error("Error checking session:", sessionError.message);
-        return;
-      }
-
-      if (sessionData?.session?.user?.id) {
-        const userId = sessionData.session.user.id;
-        const { data: userData, error: userError } = await supabase
-          .from("users")
-          .select("current_creature_id")
-          .eq("id", userId)
-          .single();
-
-        if (userError) {
-          console.error("Error fetching user data:", userError.message);
-          return;
-        }
-
-        if (userData?.current_creature_id) {
-          navigate("/battlefield");
-        } else {
-          navigate("/onboarding");
-        }
-      }
-    };
-
-    checkSession();
-  }, [navigate]);
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (user) {
+      navigate("/battlefield");
+    }
+  }, [user, navigate]);
 
   const toggleSignIn = () => {
     setIsSignIn(!isSignIn);
@@ -56,48 +31,52 @@ export const Login: React.FC = () => {
   const handleSubmit = async () => {
     setLoading(true);
 
-    const response = isSignIn
-      ? await supabase.auth.signInWithPassword({ email, password })
-      : await supabase.auth.signUp({ email, password });
+    try {
+      const response = isSignIn
+        ? await supabase.auth.signInWithPassword({ email, password })
+        : await supabase.auth.signUp({ email, password });
 
-    if (response.error) {
-      setError(response.error.message);
-      setLoading(false);
-      return;
-    }
+      if (response.error) {
+        setError(response.error.message);
+        setLoading(false);
+        return;
+      }
 
-    if (!isSignIn) {
-      // Additional tasks for sign-up success, like inserting user data
-      const userId = response.data.user?.id;
-      if (userId) {
-        const { error: insertError } = await supabase.from("users").insert([
-          {
-            id: userId,
-            username: email.split("@")[0],
-            xp: 0,
-            level: 1,
-            balance: 0,
-          },
-        ]);
-        if (insertError) {
-          setError(
-            `Sign-up successful, but user data insert failed: ${insertError.message}`,
-          );
+      if (!isSignIn) {
+        // Additional tasks for sign-up success, like inserting user data
+        const userId = response.data.user?.id;
+        if (userId) {
+          const { error: insertError } = await supabase.from("users").insert([
+            {
+              id: userId,
+              username: email.split("@")[0],
+              xp: 0,
+              level: 1,
+              balance: 0,
+            },
+          ]);
+          if (insertError) {
+            setError(
+              `Sign-up successful, but user data insert failed: ${insertError.message}`
+            );
+          } else {
+            setSuccessMessage(
+              "Sign-up successful! Check your email for confirmation."
+            );
+            navigate("/onboarding");
+          }
         } else {
-          setSuccessMessage(
-            "Sign-up successful! Check your email for confirmation.",
-          );
-          navigate("/onboarding");
+          setError("Failed to retrieve user ID after sign-up.");
         }
       } else {
-        setError("Failed to retrieve user ID after sign-up.");
+        setSuccessMessage("Login successful! Redirecting...");
+        navigate("/battlefield");
       }
-    } else {
-      setSuccessMessage("Login successful! Redirecting...");
-      navigate("/battlefield"); // or another appropriate route
+    } catch (err) {
+      setError("An unexpected error occurred during authentication.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -122,7 +101,6 @@ export const Login: React.FC = () => {
             ? "Need to create an account? Sign Up"
             : "Already have an account? Sign In"
         }
-        // disabled={loading}
       />
     </div>
   );

@@ -4,13 +4,16 @@
   align-items: center;
   gap: 32px;
   flex-direction: column;
+  border: 2px solid white;
+  padding: 24px;
+  border-radius: 16px;
+  height: 366px;
 }
 
 .creature-img {
   width: 140px;
   z-index: 2;
   position: relative;
-
 }
 
 .creature-life-bar {
@@ -35,9 +38,7 @@
     animation: enemyAttack 1s infinite linear;
     //bottom: 50px;
     //right: 170px
-
   }
-
 }
 
 .hit-recoil-left {

@@ -34,10 +34,7 @@ export const Creature: React.FC<CreatureProps> = ({
     creatureAttributes || {};
   return (
     <div
-      className={classNameParserCore(
-        "creature-container relative fit-content",
-        className,
-      )}
+      className={classNameParserCore("creature-container relative", className)}
       onClick={onClick}
     >
       {(currentHealth || currentHealth === 0) && (
@@ -57,7 +54,7 @@ export const Creature: React.FC<CreatureProps> = ({
         className={classNameParserCore(
           "creature-img",
           { "is-enemy": isEnemy },
-          imgClassName,
+          imgClassName
         )}
         alt={"creature"}
       />

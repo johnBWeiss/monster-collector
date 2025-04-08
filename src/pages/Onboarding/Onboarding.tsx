@@ -1,102 +1,142 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { supabase } from "../../../supabaseClient";
-import { useNavigate } from "react-router";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { CreatureSelectionCard } from "../../components/CreatureSelectionCard/CreatureSelectionCard";
+import { GameController } from "../../controllers/GameController";
+import { CreatureController } from "../../controllers/CreatureController";
+import "./Onboarding.scss";
 
-import CreatureSelection from "../../components/creatureSelection/CreatureSelection";
-import { PageSection } from "../../coreComponents/pageSection/PageSection";
+type SpecialtyType = "attack" | "defense" | "speed" | "flight" | "power";
 
-export const Onboarding: React.FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+type Creature = {
+  id: number;
+  name: string;
+  image: string;
+  specialty: {
+    type: SpecialtyType;
+    icon: string;
+  };
+  stats: {
+    attack: number;
+    defense: number;
+    speed: number;
+    health: number;
+    power: number;
+  };
+};
 
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      try {
-        const { data: sessionData, error: sessionError } =
-          await supabase.auth.getSession();
-        if (sessionError) {
-          console.error("Error fetching session:", sessionError.message);
-          setError("Failed to fetch user session.");
-          return navigate("/");
-        }
-
-        if (sessionData?.session?.user?.id) {
-          const userId = sessionData.session.user.id;
-
-          const { data: userData, error: userError } = await supabase
-            .from("users")
-            .select("current_creature_id")
-            .eq("id", userId)
-            .single();
-
-          if (userError) {
-            console.error("Error fetching user data:", userError.message);
-            setError("Failed to fetch user data.");
-            return;
-          }
-
-          if (userData?.current_creature_id) {
-            navigate("/battlefield");
-          } else {
-            setLoading(false); // Show the onboarding screen if no current creature
-          }
-        } else {
-          navigate("/");
-        }
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        setError("An unexpected error occurred.");
-      }
-    };
-
-    // checkOnboardingStatus();
-  }, [navigate]);
-
-  const handleSelectCreature = useCallback(
-    async (creatureId: string) => {
-      try {
-        const { data: sessionData, error: sessionError } =
-          await supabase.auth.getSession();
-
-        if (sessionError) {
-          console.error("Error fetching session:", sessionError.message);
-          setError("Failed to fetch user session.");
-          return;
-        }
-
-        const userId = sessionData?.session?.user?.id;
-        if (!userId) {
-          setError("No user session found.");
-          return navigate("/");
-        }
-
-        // Update the user's current creature ID in the database
-        const { error: updateError } = await supabase
-          .from("users")
-          .update({ current_creature_id: creatureId })
-          .eq("id", userId);
-
-        if (updateError) {
-          console.error("Error updating user data:", updateError.message);
-          setError("Failed to update user data.");
-        } else {
-          navigate("/battlefield"); // Redirect to battlefield after selection
-        }
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        setError("An unexpected error occurred.");
-      }
+const AVAILABLE_CREATURES: Creature[] = [
+  {
+    id: 1,
+    name: "Yogi",
+    image: "/src/assets/images/robots/characters/hero1.png",
+    specialty: {
+      type: "defense",
+      icon: "🛡️",
     },
-    [navigate],
+    stats: {
+      attack: 75,
+      defense: 85,
+      speed: 70,
+      health: 180,
+      power: 80,
+    },
+  },
+  {
+    id: 2,
+    name: "Baddy",
+    image: "/src/assets/images/robots/characters/hero2.png",
+    specialty: {
+      type: "attack",
+      icon: "⚔️",
+    },
+    stats: {
+      attack: 90,
+      defense: 65,
+      speed: 85,
+      health: 160,
+      power: 95,
+    },
+  },
+];
+
+const Onboarding = () => {
+  const navigate = useNavigate();
+  const [selectedCreatureId, setSelectedCreatureId] = useState<number | null>(
+    null
+  );
+  const gameController = new GameController(
+    new CreatureController({
+      id: 0,
+      name: "",
+      currentHealth: 0,
+      maxHealth: 0,
+      defense: 0,
+      abilities: [],
+      powerCore: { flight: 0, defense: 0, offense: 0 },
+      balance: 0,
+    }),
+    new CreatureController({
+      id: 0,
+      name: "",
+      currentHealth: 0,
+      maxHealth: 0,
+      defense: 0,
+      abilities: [],
+      powerCore: { flight: 0, defense: 0, offense: 0 },
+      balance: 0,
+    })
   );
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  const handleSelectCreature = (id: number) => {
+    setSelectedCreatureId(id);
+    const selectedCreature = AVAILABLE_CREATURES.find((c) => c.id === id);
+
+    if (selectedCreature) {
+      // Convert the creature data to CreatureAttributes format
+      const creatureAttributes = {
+        id: selectedCreature.id,
+        name: selectedCreature.name,
+        currentHealth: selectedCreature.stats.health,
+        maxHealth: selectedCreature.stats.health,
+        defense: selectedCreature.stats.defense,
+        abilities: [], // You'll need to add abilities based on the creature type
+        powerCore: {
+          flight: 0,
+          defense: selectedCreature.stats.defense,
+          offense: selectedCreature.stats.attack,
+        },
+        balance: 100,
+        image: selectedCreature.image,
+      };
+
+      // Emit the creature selection event
+      gameController.selectCreature(creatureAttributes);
+
+      // Navigate to battlefield after a short delay to show selection
+      setTimeout(() => {
+        navigate("/battlefield");
+      }, 500);
+    }
+  };
 
   return (
-    <PageSection>
-      <CreatureSelection onSelectCreature={handleSelectCreature} />
-    </PageSection>
+    <div className="onboarding-container">
+      <h1 className="onboarding-title">Choose Your Creature</h1>
+      <div className="creatures-grid">
+        {AVAILABLE_CREATURES.map((creature) => (
+          <CreatureSelectionCard
+            key={creature.id}
+            name={creature.name}
+            image={creature.image}
+            stats={creature.stats}
+            specialty={creature.specialty}
+            onClick={() => handleSelectCreature(creature.id)}
+            isSelected={selectedCreatureId === creature.id}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
+
+export default Onboarding;

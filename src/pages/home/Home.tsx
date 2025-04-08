@@ -14,6 +14,7 @@ import { Ability } from "../../data/abilitiesDirectory/abilitiesDirectory";
 import { getEnemyAbility } from "./utilities/enemySimulationFunctions";
 import { mapAbilities } from "./utilities/parserFunctions";
 import { handleGameOver } from "./utilities/gameplayFunctions";
+import { CreatureAttributes } from "../../controllers/CreatureController";
 
 export const Home: FC = () => {
   const audioRef = useRef(new Audio(fireballSound));
@@ -33,7 +34,7 @@ export const Home: FC = () => {
         offense: 2,
       },
       balance: 100,
-    }),
+    })
   );
 
   const enemy = useRef(
@@ -51,11 +52,11 @@ export const Home: FC = () => {
         offense: 3,
       },
       balance: 100,
-    }),
+    })
   );
 
   const gameController = useRef(
-    new GameController(user.current, enemy.current),
+    new GameController(user.current, enemy.current)
   );
 
   const userAttributes = useCreatureAttributes(user.current);
@@ -81,7 +82,7 @@ export const Home: FC = () => {
     target: CreatureController,
     setProjectileImg: React.Dispatch<React.SetStateAction<string>>,
     setTargetShaking: React.Dispatch<React.SetStateAction<boolean>>,
-    ability: Ability,
+    ability: Ability
   ) => {
     if (isTurnLocked) return;
     setIsTurnLocked(true);
@@ -148,7 +149,7 @@ export const Home: FC = () => {
         enemy.current,
         setUserAbilityImg,
         setIsEnemyShaking,
-        ability,
+        ability
       );
     }
   };
@@ -174,7 +175,7 @@ export const Home: FC = () => {
           user.current,
           setEnemyAbilityImg,
           setIsUserShaking,
-          ability,
+          ability
         );
       }
     };
@@ -185,6 +186,27 @@ export const Home: FC = () => {
     return () => {
       gameController.current.off("turnChange", handleTurnChange);
       gameController.current.off("gameOver", handleGameOver);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Listen for creature selection event
+    const handleCreatureSelected = ({
+      creature,
+    }: {
+      creature: CreatureAttributes;
+    }) => {
+      // Update the user's creature with the selected one
+      user.current = new CreatureController(creature);
+      // Update the game controller with the new user creature
+      gameController.current = new GameController(user.current, enemy.current);
+    };
+
+    gameController.current.on("creatureSelected", handleCreatureSelected);
+
+    // Cleanup
+    return () => {
+      gameController.current.off("creatureSelected", handleCreatureSelected);
     };
   }, []);
 

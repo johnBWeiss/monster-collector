@@ -1,0 +1,89 @@
+.card {
+  width: 260px;
+  background: linear-gradient(#1a1f2b, #22303e);
+  border-radius: 16px;
+  border: 3px solid #4ec3f7;
+  padding: 12px;
+  position: relative;
+  color: white;
+  box-shadow: 0 0 20px #4ec3f777;
+  font-family: sans-serif;
+}
+
+.cost-circle {
+  position: absolute;
+  top: -16px;
+  left: -16px;
+  background: #a2d149;
+  border: 4px solid #333;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.image-container {
+  height: 240px;
+  background-size: contain;
+  background-position: center;
+  border: 2px solid #4ec3f7;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.title {
+  background: #4ec3f7;
+  color: black;
+  text-align: center;
+  font-weight: bold;
+  padding: 4px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+}
+
+.label {
+  text-align: center;
+  background: #666;
+  font-size: 12px;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-bottom: 6px;
+}
+
+.description {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.bottom-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat {
+  background: #a2d149;
+  color: black;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  border: 2px solid #333;
+}
+
+.diamond {
+  width: 20px;
+  height: 20px;
+  background: #4ec3f7;
+  transform: rotate(45deg);
+  border: 2px solid #222;
+}
