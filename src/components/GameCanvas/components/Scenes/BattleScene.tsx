@@ -7,6 +7,9 @@ export class BattleScene extends Phaser.Scene {
     private enemy!: Phaser.GameObjects.Container;
     private audio!: AudioManager;
     private score = 0;
+    private enemyIsFront = true;
+    private enemyFlipLock = false;
+    private enemyLastClick = 0;
 
     constructor() {
         super("Battle");
@@ -20,12 +23,47 @@ export class BattleScene extends Phaser.Scene {
         // this.audio.startMusic("music_battle");
 
         this.enemy = this.add.container(width / 2 + 200, height / 2 - 20);
-        this.enemy.add(this.add.rectangle(0, 0, 120, 90, 0xaa3333).setStrokeStyle(3, 0x000));
-        this.add.text(this.enemy.x, this.enemy.y - 70, "Enemy", {color: "#ffd6d6"}).setOrigin(0.5);
+        // Make the enemy a card as well (non-draggable)
+        const ENEMY_CARD_SCALE = 2;
+        this.enemy.setScale(ENEMY_CARD_SCALE);
+        const eRobot = this.add.image(0, -36, "enemyCard").setOrigin(0.5).setName("enemyFront");
+        // Fill the full card footprint with the enemy art itself (no white base)
+        const eInnerW = 100;
+        const eInnerH = 140;
+        const eTex = this.textures.get("enemyCard").getSourceImage() as HTMLImageElement;
+        const eScale = Math.min(eInnerW / eTex.width, eInnerH / eTex.height);
+        eRobot.setScale(eScale);
+        const eShadow = this.add.image(0, -36, "enemyCard")
+            // .setOrigin(0.5)
+            .setScale(eScale * 1.02)
+            .setName("enemyFrontShadow")
+        // .setTint(0x000000)
+        // .setAlpha(0.25)
+        // .setDepth(-1);
+
+        const eBack = this.add.image(0, -36, "card").setOrigin(0.5).setName("enemyBack").setVisible(false);
+
+        this.enemy.add([eBack, eShadow, eRobot]);
+
+        // Make enemy interactive for double-click flip
+        this.enemy.setSize(100 * ENEMY_CARD_SCALE, 140 * ENEMY_CARD_SCALE).setInteractive({useHandCursor: true});
+        this.enemy.on("pointerdown", () => {
+            const now = this.time.now;
+            if (now - this.enemyLastClick < 300) {
+                this.flipEnemy();
+                this.enemyLastClick = 0;
+            } else {
+                this.enemyLastClick = now;
+            }
+        });
 
 
-        // simple hand
-        [width / 2 - 120, width / 2, width / 2 + 120].forEach((x, i) => this.spawnCard(x, height - 120, `C-${i + 1}`));
+        // simple hand with spacing based on scaled card width
+        const LAYOUT_CARD_SCALE = 2;
+        const cardWidth = 100 * LAYOUT_CARD_SCALE;
+        const gap = 24;
+        const spacing = cardWidth + gap;
+        [width / 2 - spacing, width / 2].forEach((x, i) => this.spawnCard(x, height - 120, `C-${i + 1}`));
 
         // bridge events
         bridge.on("startBattle", ({deckId}) => console.log("startBattle", deckId));
@@ -40,9 +78,58 @@ export class BattleScene extends Phaser.Scene {
         });
     }
 
+    private flipEnemy() {
+        if (this.enemyFlipLock) return;
+        this.enemyFlipLock = true;
+
+        const originalScaleX = this.enemy.scaleX;
+        const toFront = !this.enemyIsFront; // if currently back, we are flipping to front
+
+        const front = this.enemy.getByName("enemyFront") as Phaser.GameObjects.Image | null;
+        const frontShadow = this.enemy.getByName("enemyFrontShadow") as Phaser.GameObjects.Image | null;
+        const back = this.enemy.getByName("enemyBack") as Phaser.GameObjects.Image | null;
+
+        this.tweens.add({
+            targets: this.enemy,
+            scaleX: 0,
+            duration: 120,
+            ease: "quad.in",
+            onComplete: () => {
+                // swap visibility at the "mid-flip"
+                if (front) front.setVisible(toFront);
+                if (frontShadow) frontShadow.setVisible(toFront);
+                if (back) back.setVisible(!toFront);
+
+                this.tweens.add({
+                    targets: this.enemy,
+                    scaleX: originalScaleX,
+                    duration: 140,
+                    ease: "quad.out",
+                    onComplete: () => {
+                        this.enemyIsFront = toFront;
+                        this.enemyFlipLock = false;
+                    }
+                });
+            }
+        });
+    }
+
     private spawnCard(x: number, y: number, id: string) {
         const c = this.add.container(x, y);
         c.setDepth(10);
+
+        // Scale the entire card container to make the card 4x bigger
+        const CARD_SCALE = 2;
+        c.setScale(CARD_SCALE);
+
+        // Prevent the card from being cut off at the bottom after scaling
+        const margin = 12; // small padding from the screen bottom
+        const halfHeight = (140 * CARD_SCALE) / 2;
+        if (y + halfHeight > this.scale.height - margin) {
+            c.y = this.scale.height - margin - halfHeight;
+            // Ensure the return tween goes back to the clamped Y, not the original
+            y = c.y;
+        }
 
         // Base card background (from your generated "card" texture)
         const base = this.add.image(0, 0, "card").setOrigin(0.5);
@@ -54,20 +141,21 @@ export class BattleScene extends Phaser.Scene {
         const cardInnerWidth = 90;
         const cardInnerHeight = 120;
 
+        const rTex = this.textures.get("robotCard").getSourceImage() as HTMLImageElement;
         const scale = Math.min(
-            cardInnerWidth / robot.width,
-            cardInnerHeight / robot.height
+            cardInnerWidth / rTex.width,
+            cardInnerHeight / rTex.height
         );
 
         robot.setScale(scale);
 
         // Optional: add a soft shadow behind robot for depth
         const shadow = this.add.image(0, -6, "robotCard")
-            .setOrigin(0.5)
+            // .setOrigin(0.5)
             .setScale(scale * 1.02)
-            .setTint(0x000000)
-            .setAlpha(0.25)
-            .setDepth(-1);
+        // .setTint(0x000000)
+        // .setAlpha(0.25)
+        // .setDepth(-1);
 
         // Label text
         const label = this.add
@@ -82,7 +170,7 @@ export class BattleScene extends Phaser.Scene {
         c.add([shadow, base, robot, label]);
 
         // Draggable interaction
-        c.setSize(100, 140).setInteractive({draggable: true, cursor: "grab"});
+        c.setSize(100 * CARD_SCALE, 140 * CARD_SCALE).setInteractive({draggable: true, cursor: "grab"});
         this.input.setDraggable(c, true);
 
         c.on("drag", (_p: any, dragX: number, dragY: number) => c.setPosition(dragX, dragY));

@@ -36,6 +36,9 @@ export default function GameCanvas() {
                 mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
             },
+            render: {
+                roundPixels: true,
+            },
             audio: {disableWebAudio: false},
         };
 

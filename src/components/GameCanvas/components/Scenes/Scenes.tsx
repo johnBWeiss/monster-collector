@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import robotCard from "../../../../assets/images/robots/characters/hero1.png"
+import enemyBot from "../../../../assets/images/robots/characters/enemy-bot-1.png"
 
 export class BootScene extends Phaser.Scene {
     constructor() {
@@ -18,6 +19,7 @@ export class BootScene extends Phaser.Scene {
         g.destroy();
 
         this.load.image("robotCard", robotCard);
+        this.load.image("enemyCard", enemyBot);
         this.load.on('filecomplete-image-robotCard', () => console.log('robot loaded'));
         this.load.on('loaderror', (file: any) => console.warn('load error', file));
 
