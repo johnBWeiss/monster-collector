@@ -65,6 +65,18 @@ const SHAKE_INTENSITY = 0.01;
 const SHAKE_MS = 150;
 const DAMAGE_TEXT = "-6" as const;
 
+// laser aiming
+const LASER_COLOR = 0xff3344;
+const LASER_WIDTH = 3;
+const GLOW_COLOR = LASER_COLOR;
+const GLOW_WIDTH = 6;
+
+// box shadow for aim mode
+const SHADOW_COLOR = 0x000000;
+const SHADOW_ALPHA = 0.35; // max opacity at inner edge
+const SHADOW_EXPAND = 14;  // px outward (unscaled)
+const SHADOW_STEPS = 8;    // more steps = softer falloff
+
 export class BattleScene extends Phaser.Scene {
     private enemy!: Phaser.GameObjects.Container;
     private audio!: AudioManager;
@@ -83,6 +95,9 @@ export class BattleScene extends Phaser.Scene {
 
         this.audio = new AudioManager(this);
         // this.audio.startMusic("music_battle");
+
+        // Enable right-click for cancel without showing the browser context menu
+        this.input.mouse?.disableContextMenu();
 
         this.enemy = this.buildEnemy(width / 2 + 200, height / 2 - 20);
         this.wireEnemyInteractions();
@@ -158,25 +173,166 @@ export class BattleScene extends Phaser.Scene {
         // Add everything to the container
         container.add([shadow, base, robot, label]);
 
-        // Draggable interaction
+        // Soft box shadow graphics (child of container so it scales with the card)
+        const boxShadow = this.add.graphics().setVisible(false);
+        // Draw a faux-blur shadow by layering expanded rounded-rect strokes
+        const drawBoxShadow = () => {
+            boxShadow.clear();
+            for (let i = SHADOW_STEPS; i >= 1; i--) {
+                const t = i / SHADOW_STEPS;
+                const expand = SHADOW_EXPAND * t;
+                const alpha = SHADOW_ALPHA * t * t; // denser near the edge
+                boxShadow.lineStyle(2 / PLAYER_CARD_SCALE, SHADOW_COLOR, alpha);
+                boxShadow.strokeRoundedRect(
+                    -CARD_W / 2 - expand,
+                    -CARD_H / 2 - expand,
+                    CARD_W + expand * 2,
+                    CARD_H + expand * 2,
+                    12 + expand * 0.4
+                );
+            }
+        };
+        drawBoxShadow();
+        container.add(boxShadow);
+
+        // Additive color glow for aim mode
+        const glow = this.add.graphics().setVisible(false).setBlendMode(Phaser.BlendModes.ADD);
+        const drawGlow = () => {
+            glow.clear();
+            // Soft glow by layering outward strokes
+            const STEPS = 6;
+            for (let i = STEPS; i >= 1; i--) {
+                const t = i / STEPS;
+                const expand = (GLOW_WIDTH * 2) * t; // outward growth
+                const alpha = 0.28 * t; // brighter near edge
+                glow.lineStyle(Math.max(1, GLOW_WIDTH / PLAYER_CARD_SCALE), GLOW_COLOR, alpha);
+                glow.strokeRoundedRect(
+                    -CARD_W / 2 - expand,
+                    -CARD_H / 2 - expand,
+                    CARD_W + expand * 2,
+                    CARD_H + expand * 2,
+                    12 + expand * 0.6
+                );
+            }
+        };
+        drawGlow();
+        container.add(glow);
+
+        // Ensure shadow and glow sit behind card visuals
+        container.sendToBack(glow);
+        container.sendToBack(boxShadow);
+
+        // Aiming interaction (laser instead of drag)
         container
             .setSize(CARD_W * PLAYER_CARD_SCALE, CARD_H * PLAYER_CARD_SCALE)
-            .setInteractive({draggable: true, cursor: "grab"});
-        this.input.setDraggable(container, true);
+            .setInteractive({useHandCursor: true});
 
-        container.on("drag", (_p: any, dragX: number, dragY: number) => container.setPosition(dragX, dragY));
+        const laser = this.add.graphics().setDepth(15).setVisible(false);
+        let aiming = false;
+        let lastClick = 0;
+        let moveHandler: ((p: Phaser.Input.Pointer) => void) | null = null;
+        let rightClickHandler: ((p: Phaser.Input.Pointer) => void) | null = null;
+        let aimingAtEnemy = false;
 
-        // --- Hit / play logic ---
-        container.on("dragend", async () => {
-            const onBoard = this.isWithinBoard(container.x, container.y);
-            if (!onBoard) {
-                this.tweens.add({targets: container, x: homeX, y: homeY, duration: RETURN_TWEEN_DUR, ease: EASE_OUT});
+        const clearAim = () => {
+            aiming = false;
+            aimingAtEnemy = false;
+            laser.clear().setVisible(false);
+            boxShadow.setVisible(false);
+            glow.setVisible(false);
+            if (moveHandler) {
+                this.input.off("pointermove", moveHandler as any);
+                moveHandler = null;
+            }
+            if (rightClickHandler) {
+                this.input.off("pointerdown", rightClickHandler as any);
+                rightClickHandler = null;
+            }
+            this.input.setDefaultCursor("default");
+        };
+
+        const updateAim = (pointer: Phaser.Input.Pointer) => {
+            const cx = container.x;
+            const cy = container.y;
+            const bounds = this.enemy.getBounds();
+            const px = pointer.worldX;
+            const py = pointer.worldY;
+            aimingAtEnemy = bounds.contains(px, py);
+
+            const tx = aimingAtEnemy ? this.enemy.x : px;
+            const ty = aimingAtEnemy ? this.enemy.y : py;
+
+            // Compute start point on the card border in the direction of target
+            let dx = tx - cx;
+            let dy = ty - cy;
+            const len = Math.hypot(dx, dy) || 1e-6;
+            const nx = dx / len;
+            const ny = dy / len;
+            const hw = (CARD_W * PLAYER_CARD_SCALE) / 2;
+            const hh = (CARD_H * PLAYER_CARD_SCALE) / 2;
+            const t = Math.min(Math.abs(hw / (dx || 1e-6)), Math.abs(hh / (dy || 1e-6)));
+            let sx = cx + dx * t;
+            let sy = cy + dy * t;
+            // Nudge outward a bit so it visually continues the border glow
+            const OUTWARD = Math.max(1, GLOW_WIDTH * 0.5);
+            sx += nx * OUTWARD;
+            sy += ny * OUTWARD;
+
+            laser.clear();
+            laser.lineStyle(LASER_WIDTH, LASER_COLOR, 1);
+            laser.beginPath();
+            laser.moveTo(sx, sy);
+            laser.lineTo(tx, ty);
+            laser.strokePath();
+        };
+
+        container.on("pointerdown", async () => {
+            const now = this.time.now;
+            if (now - lastClick < DOUBLE_CLICK_MS) {
+                // Double-click: fire if aimed at enemy
+                if (aiming && aimingAtEnemy) {
+                    await this.applyHitEffects();
+                    this.time.delayedCall(DESTROY_DELAY_MS, () => {
+                        clearAim();
+                        laser.destroy();
+                        container.destroy();
+                    });
+                } else {
+                    // not aimed — just clear aim state
+                    clearAim();
+                }
+                lastClick = 0;
                 return;
             }
 
-            await this.applyHitEffects();
-            this.time.delayedCall(DESTROY_DELAY_MS, () => container.destroy());
+            // Single click: enter aiming mode
+            lastClick = now;
+            aiming = true;
+            laser.setVisible(true);
+            boxShadow.setVisible(true);
+            drawBoxShadow();
+            glow.setVisible(true);
+            drawGlow();
+            this.input.setDefaultCursor("crosshair");
+
+            // Listen for pointer movement while aiming
+            moveHandler = (p: Phaser.Input.Pointer) => updateAim(p);
+            this.input.on("pointermove", moveHandler as any);
+            // Also listen for right-click to cancel while aiming
+            rightClickHandler = (p: Phaser.Input.Pointer) => {
+                // Phaser sets button === 2 for right mouse, and provides rightButtonDown()
+                if (p.rightButtonDown() || p.button === 2) {
+                    clearAim();
+                }
+            };
+            this.input.on("pointerdown", rightClickHandler as any);
+            // Initial draw using current pointer position
+            updateAim(this.input.activePointer);
         });
+
+        // Right-click or ESC to cancel aim (quality-of-life)
+        this.input.keyboard?.on("keydown-ESC", clearAim);
+        this.input.on("pointerupoutside", () => aiming && clearAim());
     }
 
     // ---- Helpers & utilities ----

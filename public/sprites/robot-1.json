@@ -1,0 +1,83 @@
+{
+	"textures": [
+		{
+			"image": "robot-1.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1123,
+				"h": 504
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "left-arm-upper-robot-1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 292,
+						"h": 426
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 292,
+						"h": 426
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 292,
+						"h": 426
+					}
+				},
+				{
+					"filename": "robot-head-1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 336,
+						"h": 391
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 336,
+						"h": 391
+					},
+					"frame": {
+						"x": 292,
+						"y": 0,
+						"w": 336,
+						"h": 391
+					}
+				},
+				{
+					"filename": "torso-robot-1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 495,
+						"h": 504
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 495,
+						"h": 504
+					},
+					"frame": {
+						"x": 628,
+						"y": 0,
+						"w": 495,
+						"h": 504
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:5b5c8227909559eaa61ff8ca22360788:103e62ca5ee46c056e2ae66fd49bef9d:7ec9c24671045b3434df41d124599496$"
+	}
+}

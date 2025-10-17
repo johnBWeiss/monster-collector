@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
-import GameCanvas, {bridge} from "../../components/GameCanvas/GameCanvas";
+import {bridge} from "../../components/GameCanvas/GameCanvas";
+import BattleCanvas from "../../components/BattleCanvas/BattleCanvas";
 
 export const GameCanvasOverlay = () => {
     const [score, setScore] = useState(0);
@@ -20,7 +21,9 @@ export const GameCanvasOverlay = () => {
             </header>
 
             <div className="relative">
-                <GameCanvas/>
+                {/*<GameCanvas/>*/}
+                <BattleCanvas/>
+
                 {/* Overlay UI if you want */}
                 <div style={{position: "absolute", top: 8, right: 8}}>
                     <button onClick={() => bridge.emit("endTurn")}>End Turn</button>
